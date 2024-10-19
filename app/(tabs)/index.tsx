@@ -3,13 +3,11 @@ import { View, StyleSheet, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ThemedText } from "@/components/ThemedText";
 import { MariottShades } from "@/constants/Colors";
+import SafeArea from "@/components/SafeArea";
 
 const HomePage = () => {
 	return (
-		<SafeAreaView style={styles.container}>
-			<ThemedText type="subtitle" style={styles.hotelTitle}>
-				Marriott
-			</ThemedText>
+		<SafeArea style={styles.container}>
 			<ThemedText type="title" style={styles.header}>
 				Welcome, Mark
 			</ThemedText>
@@ -48,25 +46,17 @@ const HomePage = () => {
 					</View>
 				</Pressable>
 			</View>
-		</SafeAreaView>
+		</SafeArea>
 	);
 };
 
 const styles = StyleSheet.create({
 	container: {
-		flex: 1,
-		backgroundColor: MariottShades.background,
+		//backgroundColor: MariottShades.background,
 		paddingHorizontal: 16,
 		paddingVertical: 24,
 	},
-	hotelTitle: {
-		textAlign: "center",
-		fontWeight: "300",
-		fontFamily: "Poppins",
-		fontSize: 18,
-		//color: MariottShades.secondary,
-		letterSpacing: 1,
-	},
+
 	header: {
 		fontSize: 34,
 		textAlign: "center",
