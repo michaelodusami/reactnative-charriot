@@ -22,8 +22,8 @@ const SafeArea: React.FC<SafeAreaProps> = ({ children, style }) => {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		paddingHorizontal: 16,
-		paddingVertical: 24,
+		// paddingHorizontal: 16,
+		// paddingVertical: 24,
 	},
 	hotelTitle: {
 		textAlign: "center",

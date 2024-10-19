@@ -1,0 +1,7 @@
+Acessibility: 
+- TextSize
+- DyslexiaMode
+
+
+Help Button / customer Support
+Delete Account Button

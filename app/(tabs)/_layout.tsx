@@ -32,7 +32,19 @@ export default function TabLayout() {
 						title: "chatbot",
 						tabBarIcon: ({ color, focused }) => (
 							<TabBarIcon
-								name={focused ? "chatbox" : "chatbox-ellipses-outline"}
+								name={focused ? "chatbox-ellipses-outline" : "chatbox"}
+								color={color}
+							/>
+						),
+					}}
+				/>
+				<Tabs.Screen
+					name="profile"
+					options={{
+						title: "profile",
+						tabBarIcon: ({ color, focused }) => (
+							<TabBarIcon
+								name={focused ? "person-circle-outline" : "person"}
 								color={color}
 							/>
 						),
