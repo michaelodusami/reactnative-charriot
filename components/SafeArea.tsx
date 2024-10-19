@@ -12,7 +12,7 @@ const SafeArea: React.FC<SafeAreaProps> = ({ children, style }) => {
 	return (
 		<SafeAreaView style={[styles.container, style]}>
 			<ThemedText type="subtitle" style={styles.hotelTitle}>
-				Marriott
+				Peregrine
 			</ThemedText>
 			{children}
 		</SafeAreaView>

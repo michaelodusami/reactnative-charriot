@@ -54,7 +54,7 @@ const Profile = () => {
 					<ThemedText style={styles.editText}>EDIT PROFILE</ThemedText>
 				</TouchableOpacity> */}
 				<Image
-					source={{ uri: "https://cdn-icons-png.flaticon.com/512/147/147144.png" }}
+					source={require("../../assets/images/Chariott.png")}
 					style={styles.profileImage}
 				/>
 				<ThemedText style={styles.userName}>Kelly Peter</ThemedText>

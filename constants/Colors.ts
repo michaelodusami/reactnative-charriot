@@ -6,6 +6,12 @@
 const tintColorLight = "#0a7ea4";
 const tintColorDark = "#fff";
 
+export const PeregrineColors = {
+	blue: "rgb(45,57,87)",
+	yellow: "rbg(209,177,116)",
+	white: "#fff",
+};
+
 export const Colors2 = {
 	// Red shades
 	lightRed: "#FF6666",
