@@ -2,39 +2,82 @@ import SafeArea from "@/components/SafeArea";
 import { ThemedText } from "@/components/ThemedText";
 import { useTheme } from "@react-navigation/native";
 import React, { useContext } from "react";
-import { View, Text, TextInput, StyleSheet, FlatList, TouchableOpacity } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { View, TextInput, StyleSheet, FlatList, TouchableOpacity } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { BookingTypeContext } from "@/components/BookingTypeContext";
 
-const quickActions = [
-	{
-		id: "1",
-		title: "Emergency care",
-		description: "Immediate organization of the necessary help",
-		icon: "medical-bag",
-	},
-	{
-		id: "2",
-		title: "Symptom identification",
-		description: "Gathering information, planning further actions",
-		icon: "clipboard-pulse",
-	},
-	{
-		id: "3",
-		title: "Providing instructions",
-		description: "Help with preparing for specific or general tests",
-		icon: "file-document-outline",
-	},
-];
+const quickActionsMap = {
+	current: [
+		{
+			id: "1",
+			title: "Check-In",
+			description: "Prepare for your check-in process",
+			icon: "door-open",
+		},
+		{
+			id: "2",
+			title: "Room Service",
+			description: "Request items or services for your room",
+			icon: "room-service-outline",
+		},
+		{
+			id: "3",
+			title: "Local Attractions",
+			description: "Explore nearby attractions",
+			icon: "map-marker-radius",
+		},
+	],
+	past: [
+		{
+			id: "1",
+			title: "Leave a Review",
+			description: "Share your experience about your stay",
+			icon: "star-outline",
+		},
+		{
+			id: "2",
+			title: "Download Invoice",
+			description: "Get a copy of your payment invoice",
+			icon: "file-document-outline",
+		},
+	],
+	upcoming: [
+		{
+			id: "1",
+			title: "Pre-Check-In",
+			description: "Complete your check-in before arrival",
+			icon: "check-circle-outline",
+		},
+		{
+			id: "2",
+			title: "Room Preferences",
+			description: "Customize your room before arrival",
+			icon: "tune",
+		},
+		{
+			id: "3",
+			title: "Contact Hotel",
+			description: "Reach out to the hotel for assistance",
+			icon: "phone-outline",
+		},
+	],
+};
 
 const ChatBotScreen = () => {
-	const { bookingType } = useContext(BookingTypeContext);
-
+	const { bookingType, setBookingType } = useContext(BookingTypeContext);
 	const { colors } = useTheme(); // Access theme colors
+
+	const handleTypeChange = (type: any) => {
+		setBookingType(type);
+	};
+
+	const getQuickActions = () => {
+		return quickActionsMap[bookingType] || [];
+	};
+
 	const renderQuickAction = ({ item }) => (
 		<TouchableOpacity style={styles.actionCard}>
-			<View style={styles.iconContainer}>
+			<View style={[styles.iconContainer, { backgroundColor: colors.primary }]}>
 				<Icon name={item.icon} size={24} color="white" />
 			</View>
 			<View style={styles.actionTextContainer}>
@@ -50,11 +93,42 @@ const ChatBotScreen = () => {
 				<ThemedText style={styles.greetingText}>Hey, John</ThemedText>
 				<ThemedText style={styles.subHeadingText}>How I can help you?</ThemedText>
 			</View>
-			<ThemedText style={styles.bookingTypeStyle}>Booking Type: {bookingType}</ThemedText>
-			<ThemedText style={styles.sectionTitle}>[ Quick actions ]</ThemedText>
+
+			<View style={styles.bookingTypeContainer}>
+				<ThemedText style={styles.sectionTitle}>Booking Type:</ThemedText>
+				<View style={styles.bookingTypeRow}>
+					{["current", "past", "upcoming"].map((type) => (
+						<TouchableOpacity
+							key={type}
+							onPress={() => handleTypeChange(type)}
+							style={[
+								styles.bookingTypeButton,
+								{
+									backgroundColor:
+										bookingType === type ? colors.primary : colors.background,
+								},
+							]}
+						>
+							<ThemedText
+								style={[
+									styles.bookingTypeText,
+									{
+										color:
+											bookingType === type ? colors.background : colors.text,
+									},
+								]}
+							>
+								{type.charAt(0).toUpperCase() + type.slice(1)}
+							</ThemedText>
+						</TouchableOpacity>
+					))}
+				</View>
+			</View>
+
+			{/* <ThemedText style={styles.sectionTitle}>[ Quick actions ]</ThemedText> */}
 
 			<FlatList
-				data={quickActions}
+				data={getQuickActions()}
 				renderItem={renderQuickAction}
 				keyExtractor={(item) => item.id}
 				contentContainerStyle={styles.actionList}
@@ -67,13 +141,18 @@ const ChatBotScreen = () => {
 						{ backgroundColor: colors.background, color: colors.text },
 					]}
 					placeholder="Tell us about your request..."
+					placeholderTextColor={colors.placeholder}
 				/>
+				<TouchableOpacity style={styles.iconButton}>
+					<Icon name="microphone" size={24} color={colors.primary} />
+				</TouchableOpacity>
 			</View>
 		</SafeArea>
 	);
 };
 
 const styles = StyleSheet.create({
+	container: {},
 	header: {
 		marginTop: 16,
 		marginBottom: 24,
@@ -81,6 +160,7 @@ const styles = StyleSheet.create({
 	greetingText: {
 		fontSize: 28,
 		fontWeight: "bold",
+		lineHeight: 30,
 	},
 	subHeadingText: {
 		fontSize: 22,
@@ -91,11 +171,23 @@ const styles = StyleSheet.create({
 		fontSize: 16,
 		fontWeight: "500",
 	},
-	bookingTypeStyle: {
+	bookingTypeContainer: {
 		marginBottom: 16,
+	},
+	bookingTypeRow: {
+		flexDirection: "row",
+		justifyContent: "space-between",
+	},
+	bookingTypeButton: {
+		flex: 1,
+		paddingVertical: 8,
+		alignItems: "center",
+		borderRadius: 8,
+		marginHorizontal: 4,
+	},
+	bookingTypeText: {
 		fontSize: 16,
-		fontWeight: "900",
-		fontFamily: "Poppins",
+		fontWeight: "600",
 	},
 	actionList: {
 		paddingBottom: 16,
@@ -132,14 +224,21 @@ const styles = StyleSheet.create({
 		marginTop: 4,
 	},
 	inputContainer: {
-		marginTop: 16,
-		marginBottom: 16,
+		flexDirection: "row",
+		alignItems: "center",
+		borderRadius: 12,
+		borderWidth: 1,
+		borderColor: "#ddd",
+		paddingHorizontal: 12,
+		paddingVertical: 8,
 	},
 	input: {
-		padding: 16,
-		borderRadius: 12,
+		flex: 1,
 		fontSize: 16,
 		fontFamily: "Poppins",
+	},
+	iconButton: {
+		marginLeft: 8,
 	},
 });
 
