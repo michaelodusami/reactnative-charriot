@@ -26,6 +26,20 @@ const quickActionsMap: any = {
 			icon: "map-marker-radius",
 		},
 	],
+	past: [
+		{
+			id: "1",
+			title: "Leave a Review",
+			description: "Share your experience about your stay",
+			icon: "star-outline",
+		},
+		{
+			id: "2",
+			title: "Download Invoice",
+			description: "Get a copy of your payment invoice",
+			icon: "file-document-outline",
+		},
+	],
 	upcoming: [
 		{
 			id: "1",
@@ -154,7 +168,7 @@ const ChatBotScreen = () => {
 					<View style={styles.bookingTypeContainer}>
 						<ThemedText style={styles.sectionTitle}>Booking Type:</ThemedText>
 						<View style={styles.bookingTypeRow}>
-							{["current", "upcoming"].map((type) => (
+							{["current", "past", "upcoming"].map((type) => (
 								<TouchableOpacity
 									key={type}
 									onPress={() => handleTypeChange(type)}
