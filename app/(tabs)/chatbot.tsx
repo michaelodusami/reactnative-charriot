@@ -232,7 +232,7 @@ const styles = StyleSheet.create({
 	header: {
 		marginTop: 16,
 		marginBottom: 24,
-		paddingHorizontal: 16,
+		//paddingHorizontal: 16,
 	},
 	greetingText: {
 		fontSize: 28,
