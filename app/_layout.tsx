@@ -15,6 +15,7 @@ export default function RootLayout() {
 	const [loaded] = useFonts({
 		SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
 		Poppins: require("../assets/fonts/Poppins/Poppins-Regular.ttf"),
+    EffraFamily: require('../assets/fonts/Effra_Std_Rg.ttf')
 	});
 
 	useEffect(() => {
