@@ -8,9 +8,9 @@ import SafeArea from "@/components/SafeArea";
 const HomePage = () => {
 	return (
 		<SafeArea style={styles.container}>
-			<ThemedText type="title" style={styles.header}>
+			{/* <ThemedText type="title" style={styles.header}>
 				Welcome, Mark
-			</ThemedText>
+			</ThemedText> */}
 
 			<View style={styles.cardContainer}>
 				<Pressable style={styles.cardWrapper}>
@@ -61,6 +61,7 @@ const styles = StyleSheet.create({
 		fontSize: 34,
 		textAlign: "center",
 		fontWeight: "bold",
+		marginTop: 16,
 		//color: MariottShades.primary,
 		marginBottom: 32,
 		fontFamily: "Poppins-SemiBold",
