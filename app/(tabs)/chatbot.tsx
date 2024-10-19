@@ -1,12 +1,12 @@
 import SafeArea from "@/components/SafeArea";
 import { ThemedText } from "@/components/ThemedText";
 import { useTheme } from "@react-navigation/native";
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { View, TextInput, StyleSheet, FlatList, TouchableOpacity } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { BookingTypeContext } from "@/components/BookingTypeContext";
 
-const quickActionsMap = {
+const quickActionsMap: any = {
 	current: [
 		{
 			id: "1",
@@ -27,20 +27,20 @@ const quickActionsMap = {
 			icon: "map-marker-radius",
 		},
 	],
-	past: [
-		{
-			id: "1",
-			title: "Leave a Review",
-			description: "Share your experience about your stay",
-			icon: "star-outline",
-		},
-		{
-			id: "2",
-			title: "Download Invoice",
-			description: "Get a copy of your payment invoice",
-			icon: "file-document-outline",
-		},
-	],
+	// past: [
+	// 	{
+	// 		id: "1",
+	// 		title: "Leave a Review",
+	// 		description: "Share your experience about your stay",
+	// 		icon: "star-outline",
+	// 	},
+	// 	{
+	// 		id: "2",
+	// 		title: "Download Invoice",
+	// 		description: "Get a copy of your payment invoice",
+	// 		icon: "file-document-outline",
+	// 	},
+	// ],
 	upcoming: [
 		{
 			id: "1",
@@ -64,7 +64,7 @@ const quickActionsMap = {
 };
 
 const ChatBotScreen = () => {
-	const { bookingType, setBookingType } = useContext(BookingTypeContext);
+	const [bookingType, setBookingType] = useState<string>("current");
 	const { colors } = useTheme(); // Access theme colors
 
 	const handleTypeChange = (type: any) => {
@@ -97,7 +97,7 @@ const ChatBotScreen = () => {
 			<View style={styles.bookingTypeContainer}>
 				<ThemedText style={styles.sectionTitle}>Booking Type:</ThemedText>
 				<View style={styles.bookingTypeRow}>
-					{["current", "past", "upcoming"].map((type) => (
+					{["current", "upcoming"].map((type) => (
 						<TouchableOpacity
 							key={type}
 							onPress={() => handleTypeChange(type)}
@@ -228,9 +228,9 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		borderRadius: 12,
 		borderWidth: 1,
-		borderColor: "#ddd",
+
 		paddingHorizontal: 12,
-		paddingVertical: 8,
+		paddingVertical: 12,
 	},
 	input: {
 		flex: 1,
