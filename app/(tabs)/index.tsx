@@ -1,118 +1,42 @@
+import { StyleSheet, Text, View } from "react-native";
 import React from "react";
-import { View, StyleSheet, Pressable } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { ThemedText } from "@/components/ThemedText";
-import { MariottShades } from "@/constants/Colors";
+import { SafeAreaView } from "react-native-safe-area-context";
+import Slider from "../../components/Slider"
+import { ImageSlider } from "@/data/CarouselData";
 import SafeArea from "@/components/SafeArea";
 
 const HomePage = () => {
 	return (
 		<SafeArea style={styles.container}>
-			{/* <ThemedText type="title" style={styles.header}>
-				Welcome, Mark
-			</ThemedText> */}
-
-			<View style={styles.cardContainer}>
-				<Pressable style={styles.cardWrapper}>
-					<View style={[styles.card, styles.present]}>
-						<ThemedText type="title" style={styles.cardTitle}>
-							Present
-						</ThemedText>
-						<ThemedText style={styles.cardDescription}>
-							View all present bookings here!
-						</ThemedText>
-					</View>
-				</Pressable>
-
-				<Pressable style={styles.cardWrapper}>
-					<View style={[styles.card, styles.past]}>
-						<ThemedText type="title" style={styles.cardTitle}>
-							Past
-						</ThemedText>
-						<ThemedText style={styles.cardDescription}>
-							View all past bookings here!
-						</ThemedText>
-					</View>
-				</Pressable>
-
-				<Pressable style={styles.cardWrapper}>
-					<View style={[styles.card, styles.upcoming]}>
-						<ThemedText type="title" style={styles.cardTitle}>
-							Upcoming
-						</ThemedText>
-						<ThemedText style={styles.cardDescription}>
-							View all upcoming bookings here!
-						</ThemedText>
-					</View>
-				</Pressable>
+			<View>
+			<ThemedText style={styles.subheading}>Make new memories</ThemedText>
 			</View>
+			<SafeAreaView style={styles.carouselContainer}>
+				<Slider itemList={ImageSlider} />
+			</SafeAreaView>
 		</SafeArea>
-	);
+	)
 };
+
+export default HomePage;
 
 const styles = StyleSheet.create({
 	container: {
-		//backgroundColor: MariottShades.background,
-		paddingHorizontal: 16,
-		paddingVertical: 24,
+		paddingVertical: 24
 	},
-
-	header: {
-		fontSize: 34,
-		textAlign: "center",
-		fontWeight: "bold",
-		marginTop: 16,
-		//color: MariottShades.primary,
-		marginBottom: 32,
-		fontFamily: "Poppins-SemiBold",
-	},
-	cardContainer: {
-		flex: 1,
-		justifyContent: "space-evenly",
-	},
-	cardWrapper: {
-		marginVertical: 10,
-		borderRadius: 16,
-		// Enhanced shadow for 3D effect
-		shadowColor: "#000",
-		shadowOffset: { width: 0, height: 10 },
-		shadowOpacity: 0.3,
-		shadowRadius: 15,
-		elevation: 10, // for Android
-	},
-	card: {
-		height: 140,
-		borderRadius: 16,
-		padding: 24,
-		justifyContent: "center",
-		// 3D transform effect
-		transform: [{ perspective: 1000 }, { rotateX: "0deg" }, { rotateY: "0deg" }],
-	},
-	present: {
-		backgroundColor: MariottShades.medium,
-	},
-	past: {
-		backgroundColor: MariottShades.dark,
-	},
-	upcoming: {
-		backgroundColor: MariottShades.light,
-	},
-	cardTitle: {
-		fontSize: 22,
-		color: "white",
-		fontFamily: "Poppins-Medium",
-		textAlign: "center",
-		marginBottom: 8,
-		letterSpacing: 0.5,
-	},
-	cardDescription: {
-		fontSize: 15,
-		color: "white",
-		fontFamily: "Poppins-Light",
-		textAlign: "center",
-		opacity: 0.85,
-		letterSpacing: 0.3,
-	},
-});
-
-export default HomePage;
+	carouselContainer: {
+		flex: 0.6,
+		alignItems: "center"
+	}, 
+	subheading: {
+		width: '100%', 
+		paddingHorizontal: 60,
+		paddingRight: 20,
+		paddingVertical: 10,
+		marginBottom: -60,
+		marginTop: 20,
+		fontFamily: "Poppins",
+		fontSize: 32
+	}
+})
