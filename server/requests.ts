@@ -39,11 +39,13 @@ const preferencesEndPoints = {
 
 export const updateUserPreferences = async (userId: string, preferences: any) => {
 	try {
-		console.log(preferences);
+		console.log("Preferences = ",preferences);
+		console.log("User ID = ", userId);
 		const response = await apiInstance.put(
-			`/api/auth/users/${userId}/preferences`,
+			`https://p5vfoq23g5ps45rtvky2xydcxe0sbwph.lambda-url.us-east-1.on.aws/api/auth/users/${userId}/preferences`,
 			preferences
 		);
+		console.log("Response Data = ", response.data);
 		return response.data;
 	} catch (err) {
 		throw err;
