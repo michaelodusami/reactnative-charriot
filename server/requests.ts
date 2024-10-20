@@ -28,6 +28,24 @@ export const getUpcomingUserBooking = async (user_id: string) => {
 	}
 };
 
+export const getLocationForHotel = async (hotelId: string) => {
+	try {
+		const response = await apiInstance.get("/api/hotels/hotels/" + hotelId);
+		return response.data;
+	} catch (err) {
+		throw err;
+	}
+}
+
+export const getPastUserBookings = async (user_id: string) => {
+	try {
+		const response = await apiInstance.get("/api/bookings/bookings/past/" + user_id);
+		return response.data;
+	} catch (err) {
+		throw err;
+	}
+};
+
 export const getCurrentBookingHotel = async (user_id: string) => {
 	try {
 		const currentbooking = await getCurrnetUserBooking(user_id);
