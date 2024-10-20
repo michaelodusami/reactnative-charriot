@@ -4,7 +4,7 @@ import axios from "axios";
 const apiInstance = axios.create({
 	baseURL: API_URL,
 	headers: {
-		"x-api-key": API_KEY,
+		"API-KEY": API_KEY,
 	},
 });
 

@@ -18,10 +18,14 @@ export const signIn = async (email: string, password: string) => {
 			email: email,
 			password: password,
 		};
-		const response = await apiInstance.post(authEndPoints.signin, requestBody);
-		console.log(response);
-		return response;
+		const response = await apiInstance.post(
+			"https://p5vfoq23g5ps45rtvky2xydcxe0sbwph.lambda-url.us-east-1.on.aws/api/auth/login",
+			requestBody
+		);
+		console.log(response.data);
+		return response.data.access_token;
 	} catch (err) {
+		console.error("Error" + err);
 		throw err;
 	}
 };

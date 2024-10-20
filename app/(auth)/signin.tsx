@@ -12,8 +12,12 @@ import Checkbox from "expo-checkbox";
 import { Ionicons } from "@expo/vector-icons";
 import { ThemedText } from "@/components/ThemedText";
 import { Redirect } from "expo-router";
+import { signIn } from "@/server/requests";
+import { useUser } from "@/providers/UserContext";
 
 const LoginScreen: React.FC = () => {
+	const { user, updateUser } = useUser();
+	console.log(user);
 	const [email, setEmail] = useState<string>("");
 	const [password, setPassword] = useState<string>("");
 	const [isChecked, setIsChecked] = useState<boolean>(false);
@@ -25,11 +29,13 @@ const LoginScreen: React.FC = () => {
 		return re.test(email);
 	};
 
-	const handleLogin = () => {
-		console.log("Login pressed");
-		// endpoint --
-		// after auth has verified the user
-		setValidLogin(!validLogin);
+	const handleLogin = async () => {
+		const response = await signIn(email, password);
+		if (response) {
+			updateUser(email, response);
+			setValidLogin(true);
+			console.log("\nHello\n");
+		}
 	};
 
 	if (validLogin) {
@@ -55,7 +61,7 @@ const LoginScreen: React.FC = () => {
 							autoCapitalize="none"
 						/>
 					</View>
-					{email !== "" && !isEmailValid && (
+					{email !== "" && !validateEmail(email) && (
 						<Text style={styles.errorText}>Please enter a valid email address</Text>
 					)}
 

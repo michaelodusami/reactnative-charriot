@@ -1,5 +1,6 @@
 import SafeArea from "@/components/SafeArea";
 import { ThemedText } from "@/components/ThemedText";
+import { useUser } from "@/providers/UserContext";
 import { useTheme, useFocusEffect } from "@react-navigation/native";
 import React, { useCallback, useState } from "react";
 import { View, TextInput, StyleSheet, FlatList, TouchableOpacity } from "react-native";
@@ -63,6 +64,7 @@ const quickActionsMap: any = {
 };
 
 const ChatBotScreen = () => {
+	const { user } = useUser();
 	const [bookingType, setBookingType] = useState<string>("current");
 	const [inputText, setInputText] = useState<string>("");
 	const [messages, setMessages] = useState<Array<{ id: string; text: string; sender: string }>>(
@@ -159,7 +161,9 @@ const ChatBotScreen = () => {
 	return (
 		<SafeArea style={styles.container}>
 			<View style={styles.header}>
-				<ThemedText style={styles.greetingText}>Hey, John</ThemedText>
+				<ThemedText style={styles.greetingText}>
+					Hey, {user.userId.substring(0, user.userId.indexOf("@")).toUpperCase()}
+				</ThemedText>
 				<ThemedText style={styles.subHeadingText}>How I can help you?</ThemedText>
 			</View>
 

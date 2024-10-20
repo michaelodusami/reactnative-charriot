@@ -5,6 +5,7 @@ import { TabBarIcon } from "@/components/navigation/TabBarIcon";
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { BookingTypeProvider } from "@/components/BookingTypeContext";
+import { UserProvider } from "@/providers/UserContext";
 
 export default function TabLayout() {
 	const colorScheme = useColorScheme();

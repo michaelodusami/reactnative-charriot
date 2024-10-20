@@ -13,6 +13,7 @@ import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import ConfigurationSection from "@/components/ConfigurationScreen";
 import SettingsSection from "@/components/SettingsScreen";
+import { useUser } from "@/providers/UserContext";
 // Section Components
 
 // const PersonalInfoSection = () => (
@@ -30,6 +31,7 @@ import SettingsSection from "@/components/SettingsScreen";
 // );
 
 const Profile = () => {
+	const { user } = useUser();
 	const [selectedSection, setSelectedSection] = useState("Configuration");
 
 	// Function to render selected section component
@@ -46,6 +48,8 @@ const Profile = () => {
 		}
 	};
 
+	console.log(user);
+
 	return (
 		<SafeArea style={styles.container}>
 			{/* Profile Header */}
@@ -57,8 +61,10 @@ const Profile = () => {
 					source={require("../../assets/images/icon.png")}
 					style={styles.profileImage}
 				/>
-				<ThemedText style={styles.userName}>Kelly Peter</ThemedText>
-				<ThemedText style={styles.email}>kely@magix.com</ThemedText>
+				<ThemedText style={styles.userName}>
+					{user.userId.substring(0, user.userId.indexOf("@")).toUpperCase()}
+				</ThemedText>
+				<ThemedText style={styles.email}>{user.userId}</ThemedText>
 			</View>
 
 			{/* Top Tab Navigation */}
