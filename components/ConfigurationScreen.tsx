@@ -1,36 +1,176 @@
-import React, { useState } from "react";
-import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Switch, TextInput } from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+	View,
+	Text,
+	TouchableOpacity,
+	ScrollView,
+	StyleSheet,
+	Switch,
+	TextInput,
+} from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { Alert} from "react-native";
-import Slider from '@react-native-community/slider';
+import { Alert } from "react-native";
+import Slider from "@react-native-community/slider";
+import { getUserPreferences, updateUserPreferences } from "@/server/requests";
+import { useUser } from "@/providers/UserContext";
 
 const ConfigurationSection = () => {
-	const [temperature, setTemperature] = useState(70);
-	const [coffeeMachine, setCoffeeMachine] = useState(true);
-	const [extraBlanket, setExtraBlanket] = useState(true);
-	const [quietRoom, setQuietRoom] = useState(true);
-	const [economicRating, setEconomicRating] = useState(5);
-	const [extraBedding, setExtraBedding] = useState('');
-	const [selectedOptions, setSelectedOptions] = useState({});
-	const handleSave = () => {
-		// Here you would typically save the configuration to your backend or local storage
-		Alert.alert("Success", "Your preferences have been saved successfully!");
+	const { user } = useUser();
+	const [roomView, setRoomView] = useState("any");
+	const [temperature, setTemperature] = useState(75);
+	const [quietRoom, setQuietRoom] = useState(false);
+	const [economicRating, setEconomicRating] = useState(0); // Updated to match key "econ_rating"
+	const [extraBedding, setExtraBedding] = useState("");
+	const [selectedDietaryRestriction, setSelectedDietaryRestriction] = useState("other");
+	const [otherDietary, setOtherDietary] = useState("");
+	const [beddingPillows, setBeddingPillows] = useState(2);
+	const [beddingMattressType, setBeddingMattressType] = useState("any");
+	const [beddingPillowType, setBeddingPillowType] = useState("any");
+
+	const [miscellaneousInput, setMiscellaneousInput] = useState("");
+
+	const fetchUserData = async () => {
+		const preferences = await getUserPreferences(user.userId);
+		console.log(preferences);
+		setTemperature(preferences.climate_control || "");
+		setRoomView(preferences.room_view || "any"); // done
+		setQuietRoom(preferences.quiet_room || false);
+		setEconomicRating(preferences.econ_rating || 0);
+		setSelectedDietaryRestriction(preferences.dietary_restrictions || "other"); // done
+		setOtherDietary(preferences.dietary_restrictions_other || "");
+		setBeddingPillows(preferences.bedding_pillows || 2); // num pillows, done
+		setBeddingMattressType(preferences.bedding_mattress_type || "any"); // any
+		setBeddingPillowType(preferences.bedding_pillow_type || "any"); // any
+		setExtraBedding(preferences.bedding_other || ""); // done
+		setMiscellaneousInput(preferences.misc || ""); // done
+	};
+
+	useEffect(() => {
+		if (user.userId) {
+			fetchUserData();
+		}
+	}, [user.userId]);
+
+	const handleSave = async () => {
+		console.log(selectedDietaryRestriction, otherDietary);
+		// Create the preferences object using state values
+		const preferences = {
+			dietary_restrictions: selectedDietaryRestriction,
+			dietary_restrictions_other: otherDietary,
+			bedding_pillows: beddingPillows,
+			bedding_mattress_type: beddingMattressType,
+			bedding_pillow_type: beddingPillowType,
+			bedding_other: extraBedding,
+			climate_control: temperature,
+			room_view: roomView,
+			quiet_room: quietRoom,
+			misc: miscellaneousInput,
+			econ_rating: economicRating,
+		};
+
+		if (selectedDietaryRestriction === "other") {
+			preferences.dietary_restrictions = "other";
+			preferences.dietary_restrictions_other = otherDietary;
+		} else {
+			preferences.dietary_restrictions = selectedDietaryRestriction;
+		}
+
+		try {
+			// Call the function to update preferences in the backend
+			await updateUserPreferences(user.userId, preferences);
+			Alert.alert("Success", "Your preferences have been saved successfully!");
+		} catch (error) {
+			console.error("Error updating preferences:", error);
+			Alert.alert("Error", "Failed to save your preferences. Please try again.");
+		}
 	};
 
 	return (
 		<ScrollView style={configStyles.scrollView}>
-			{/* Bed Type Preference */}
+			{/* Room View Preference */}
 			<ConfigItem
-				icon="bed-empty"
-				title="Bed Type"
-				description="Choose your preferred bed type"
+				icon="image"
+				title="Room View"
+				description="Select your preferred room view"
 			>
 				<View style={configStyles.optionRow}>
-					{["King", "Queen", "Double"].map((type) => (
-						<TouchableOpacity key={type} style={configStyles.choiceButton}>
-							<Text style={configStyles.choiceText}>{type}</Text>
+					{["city", "garden", "pool", "any"].map((view) => (
+						<TouchableOpacity
+							key={view}
+							style={[
+								configStyles.choiceButton,
+								roomView === view && configStyles.selectedOption,
+							]}
+							onPress={() => setRoomView(view)}
+						>
+							<Text
+								style={[
+									configStyles.choiceText,
+									roomView === view && configStyles.selectedText,
+								]}
+							>
+								{view}
+							</Text>
+						</TouchableOpacity>
+					))}
+				</View>
+			</ConfigItem>
+
+			{/* Mattress Type */}
+			<ConfigItem
+				icon="bed"
+				title="Mattress Type"
+				description="Choose your preferred mattress type"
+			>
+				<View style={configStyles.optionRow}>
+					{["any", "soft", "medium", "firm"].map((type) => (
+						<TouchableOpacity
+							key={type}
+							style={[
+								configStyles.choiceButton,
+								beddingMattressType === type && configStyles.selectedOption,
+							]}
+							onPress={() => setBeddingMattressType(type)}
+						>
+							<Text
+								style={[
+									configStyles.choiceText,
+									beddingMattressType === type && configStyles.selectedText,
+								]}
+							>
+								{type}
+							</Text>
+						</TouchableOpacity>
+					))}
+				</View>
+			</ConfigItem>
+
+			{/* Pillow Type */}
+			<ConfigItem
+				icon="bed"
+				title="Pillow Type"
+				description="Choose your preferred pillow type"
+			>
+				<View style={configStyles.optionRow}>
+					{["any", "feather", "foam", "memory Foam"].map((type) => (
+						<TouchableOpacity
+							key={type}
+							style={[
+								configStyles.choiceButton,
+								beddingPillowType === type && configStyles.selectedOption,
+							]}
+							onPress={() => setBeddingPillowType(type)}
+						>
+							<Text
+								style={[
+									configStyles.choiceText,
+									beddingPillowType === type && configStyles.selectedText,
+								]}
+							>
+								{type}
+							</Text>
 						</TouchableOpacity>
 					))}
 				</View>
@@ -44,45 +184,81 @@ const ConfigurationSection = () => {
 			>
 				<View style={configStyles.optionRow}>
 					{[1, 2, 3, 4].map((number) => (
-						<TouchableOpacity key={number} style={configStyles.choiceButton}>
-							<Text style={configStyles.choiceText}>{number}</Text>
+						<TouchableOpacity
+							key={number}
+							style={[
+								configStyles.choiceButton,
+								beddingPillows === number && configStyles.selectedOption,
+							]}
+							onPress={() => setBeddingPillows(number)}
+						>
+							<Text
+								style={[
+									configStyles.choiceText,
+									beddingPillows === number && configStyles.selectedText,
+								]}
+							>
+								{number}
+							</Text>
 						</TouchableOpacity>
 					))}
 				</View>
 			</ConfigItem>
 
-			{/* Room Temperature Preference */}
+			{/* Dietary Restrictions */}
+			<ConfigItem
+				icon="food-apple"
+				title="Dietary Restrictions"
+				description="Let us know about any dietary restrictions"
+			>
+				<View style={configStyles.optionRow}>
+					{["none", "vegetarian", "vegan", "gluten-free", "halal", "kosher", "other"].map(
+						(diet) => (
+							<TouchableOpacity
+								key={diet}
+								style={[
+									configStyles.choiceButton,
+									selectedDietaryRestriction === diet &&
+										configStyles.selectedOption,
+								]}
+								onPress={() => setSelectedDietaryRestriction(diet)}
+							>
+								<Text
+									style={[
+										configStyles.choiceText,
+										selectedDietaryRestriction === diet &&
+											configStyles.selectedText,
+									]}
+								>
+									{diet}
+								</Text>
+							</TouchableOpacity>
+						)
+					)}
+				</View>
+				{selectedDietaryRestriction === "other" && (
+					<TextInput
+						style={configStyles.textInput}
+						value={otherDietary}
+						onChangeText={setOtherDietary}
+						placeholder="Enter other dietary restriction"
+						placeholderTextColor="#999"
+					/>
+				)}
+			</ConfigItem>
+			{/* Climate Control */}
 			<ConfigItem
 				icon="thermometer"
-				title="Preferred Room Temperature"
-				description="What temperature settings do you prefer in the room?"
+				title="Climate Control"
+				description="Enter your preferred room temperature setting"
 			>
-				<Slider
-					style={configStyles.slider}
-					minimumValue={0}
-					maximumValue={100}
-					step={1}
+				<TextInput
+					style={configStyles.textInput}
 					value={temperature}
-					onValueChange={setTemperature}
-					minimumTrackTintColor="#FA5A5A"
-					maximumTrackTintColor="#000000"
-					thumbTintColor="#FA5A5A"
-				/>
-				<ThemedText style={configStyles.sliderValue}>{temperature}°F</ThemedText>
-			</ConfigItem>
-
-			{/* Coffee Machine in Room */}
-			<ConfigItem
-				icon="coffee-maker"
-				title="Coffee Machine in Room"
-				description="Would you like a coffee machine in your room?"
-			>
-				<Switch
-					style={configStyles.slider}
-					value={coffeeMachine}
-					onValueChange={setCoffeeMachine}
-					trackColor={{ false: "#767577", true: "#FA5A5A" }}
-					thumbColor={coffeeMachine ? "#f4f3f4" : "#f4f3f4"}
+					onChangeText={(text) => setTemperature(text)}
+					placeholder="Enter preferred temperature"
+					placeholderTextColor="#999"
+					keyboardType="default"
 				/>
 			</ConfigItem>
 
@@ -106,18 +282,18 @@ const ConfigurationSection = () => {
 				<ThemedText style={configStyles.sliderValue}>{economicRating}</ThemedText>
 			</ConfigItem>
 
-			{/* Extra Blanket */}
+			{/* Quiet Room Preference */}
 			<ConfigItem
-				icon="more"
-				title="Extra Blanket"
-				description="Would you like an extra blanket in your room?"
+				icon="volume-off"
+				title="Request a Quiet Room"
+				description="Would you prefer a quiet room away from elevators and ice machines?"
 			>
 				<Switch
 					style={configStyles.slider}
-					value={extraBlanket}
-					onValueChange={setExtraBlanket}
+					value={quietRoom}
+					onValueChange={setQuietRoom}
 					trackColor={{ false: "#767577", true: "#FA5A5A" }}
-					thumbColor={extraBlanket ? "#f4f3f4" : "#f4f3f4"}
+					thumbColor={quietRoom ? "#f4f3f4" : "#f4f3f4"}
 				/>
 			</ConfigItem>
 
@@ -136,51 +312,19 @@ const ConfigurationSection = () => {
 				/>
 			</ConfigItem>
 
-			{/* Quiet Room Preference */}
+			{/* Miscellaneous Information */}
 			<ConfigItem
-				icon="volume-off"
-				title="Request a Quiet Room"
-				description="Would you prefer a quiet room away from elevators and ice machines?"
+				icon="information-outline"
+				title="Miscellaneous"
+				description="Any additional information or requests?"
 			>
-				<Switch
-					style={configStyles.slider}
-					value={quietRoom}
-					onValueChange={setQuietRoom}
-					trackColor={{ false: "#767577", true: "#FA5A5A" }}
-					thumbColor={quietRoom ? "#f4f3f4" : "#f4f3f4"}
+				<TextInput
+					style={configStyles.textInput}
+					value={miscellaneousInput}
+					onChangeText={setMiscellaneousInput}
+					placeholder="Enter any additional information"
+					placeholderTextColor="#999"
 				/>
-			</ConfigItem>
-
-			{/* Room View Preference */}
-			<ConfigItem
-				icon="image"
-				title="Room View"
-				description="Select your preferred room view"
-			>
-				<View style={configStyles.optionRow}>
-					{["City", "Garden", "Pool"].map((view) => (
-						<TouchableOpacity key={view} style={configStyles.choiceButton}>
-							<Text style={configStyles.choiceText}>{view}</Text>
-						</TouchableOpacity>
-					))}
-				</View>
-			</ConfigItem>
-
-			{/* Dietary Restrictions */}
-			<ConfigItem
-				icon="food-apple"
-				title="Dietary Restrictions"
-				description="Let us know about any dietary restrictions"
-			>
-				<View style={configStyles.optionRow}>
-					{["None", "Vegetarian", "Vegan", "Gluten-Free", "Halal", "Kosher"].map(
-						(diet) => (
-							<TouchableOpacity key={diet} style={configStyles.choiceButton}>
-								<Text style={configStyles.choiceText}>{diet}</Text>
-							</TouchableOpacity>
-						)
-					)}
-				</View>
 			</ConfigItem>
 
 			<TouchableOpacity style={configStyles.saveButton} onPress={handleSave}>
@@ -189,7 +333,6 @@ const ConfigurationSection = () => {
 		</ScrollView>
 	);
 };
-
 const ConfigItem = ({ icon, title, description, children }) => (
 	<ThemedView style={configStyles.configItem}>
 		<View style={configStyles.configHeader}>
@@ -207,17 +350,10 @@ const configStyles = StyleSheet.create({
 	scrollView: {
 		padding: 15,
 	},
-	sectionTitle: {
-		fontSize: 24,
-		fontWeight: "bold",
-		marginBottom: 20,
-		textAlign: "center",
-	},
 	configItem: {
 		marginBottom: 20,
 		borderRadius: 12,
 		padding: 15,
-		// backgroundColor: "#fff",
 		shadowColor: "#000",
 		shadowOffset: { width: 0, height: 2 },
 		shadowOpacity: 0.1,
@@ -249,7 +385,7 @@ const configStyles = StyleSheet.create({
 	optionRow: {
 		flexDirection: "row",
 		flexWrap: "wrap",
-		justifyContent: "center", // Centering the options
+		justifyContent: "center",
 		marginTop: 10,
 	},
 	choiceButton: {
@@ -258,7 +394,7 @@ const configStyles = StyleSheet.create({
 		borderRadius: 20,
 		backgroundColor: "#EAEAEA",
 		marginRight: 12,
-		marginBottom: 12, // Adding space between rows
+		marginBottom: 12,
 	},
 	choiceText: {
 		fontSize: 14,
@@ -268,7 +404,7 @@ const configStyles = StyleSheet.create({
 	},
 	slider: {
 		alignSelf: "center",
-		width: '100%',
+		width: "100%",
 		height: 40,
 	},
 	saveButton: {
@@ -286,17 +422,21 @@ const configStyles = StyleSheet.create({
 	selectedOption: {
 		backgroundColor: "#FA5A5A",
 	},
+	selectedText: {
+		color: "#FFFFFF",
+		fontWeight: "bold",
+	},
 	sliderValue: {
-		textAlign: 'center',
+		textAlign: "center",
 		marginTop: 10,
 	},
 	textInput: {
 		borderWidth: 1,
-		borderColor: '#ccc',
+		borderColor: "#ccc",
 		borderRadius: 5,
 		padding: 10,
 		fontSize: 16,
-		width: '100%',
+		width: "100%",
 	},
 });
 
