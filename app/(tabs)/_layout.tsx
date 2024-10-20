@@ -29,9 +29,19 @@ export default function TabLayout() {
 					}}
 				/>
 				<Tabs.Screen
+					name="requests"
+					options={{
+						title: "Requests",
+						tabBarIcon: ({ color, focused }) => (
+							<TabBarIcon name={focused ? "list" : "list-outline"} color={color} />
+						),
+						tabBarShowLabel: false,
+					}}
+				/>
+				<Tabs.Screen
 					name="chatbot"
 					options={{
-						title: "chatbot",
+						title: "Chatbot",
 						tabBarIcon: ({ color, focused }) => (
 							<TabBarIcon
 								name={focused ? "chatbox-ellipses-outline" : "chatbox"}
@@ -44,7 +54,7 @@ export default function TabLayout() {
 				<Tabs.Screen
 					name="profile"
 					options={{
-						title: "profile",
+						title: "Profile",
 						tabBarIcon: ({ color, focused }) => (
 							<TabBarIcon
 								name={focused ? "person-circle-outline" : "person"}

@@ -79,3 +79,17 @@ export const signIn = async (email: string, password: string) => {
 		throw err;
 	}
 };
+
+export const submitRequest = async (requestId: string, userEmail: string) => {
+	console.log("I have been called");
+	try {
+	  const response = await apiInstance.post(
+		`https://p5vfoq23g5ps45rtvky2xydcxe0sbwph.lambda-url.us-east-1.on.aws/api/request/${requestId}/${encodeURIComponent(userEmail)}`
+	  );
+	  console.log(response.data);
+	  return response.data;
+	} catch (err) {
+	  console.error("Error submitting request:", err);
+	  throw err;
+	}
+  };

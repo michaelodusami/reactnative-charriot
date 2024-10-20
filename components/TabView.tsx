@@ -1,12 +1,17 @@
 import React, { useState } from 'react';
-import { View, TouchableOpacity, StyleSheet, ScrollView , Image} from 'react-native';
+import { View, TouchableOpacity, StyleSheet, ScrollView, Image, Alert } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ImageSliderType } from '@/data/CarouselData';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { submitRequest } from '@/server/requests';
+import axiosInstance from "@/server/axiosInstance";
+import apiInstance from '@/server/axiosInstance';
+import { useUser } from '@/providers/UserContext'; // Import the useUser hook
 
 type Props = {
     activeItem: ImageSliderType;
+    userEmail: string;
 };
 
 const TabView: React.FC<Props> = ({ activeItem }) => {
@@ -71,30 +76,69 @@ const TabView: React.FC<Props> = ({ activeItem }) => {
             </View>
         );
 
-        const RequestsTab = () => {
+        const RequestsTab: React.FC<Props> = ({ activeItem, userEmail }) => {
+            const { user } = useUser();
+
             const services = [
                 {
                     category: 'Maintenance', items: [
-                        { name: 'Repair Request', icon: 'construct-outline' },
-                        { name: 'Plumbing Issue', icon: 'water-outline' },
-                        { name: 'Electric', icon: 'flash-outline' }
+                        { id: '1', name: 'Repair Request', icon: 'construct-outline' },
+                        { id: '2', name: 'Plumbing Issue', icon: 'water-outline' },
+                        { id: '3', name: 'Electric', icon: 'flash-outline' }
                     ]
                 },
                 {
                     category: 'Housekeeping', items: [
-                        { name: 'Room Cleaning', icon: 'brush-outline' },
-                        { name: 'Linen Change', icon: 'bed-outline' },
-                        { name: 'Toiletries', icon: 'cafe-outline' }
+                        { id: '4', name: 'Room Cleaning', icon: 'brush-outline' },
+                        { id: '5', name: 'Linen Change', icon: 'bed-outline' },
+                        { id: '6', name: 'Toiletries', icon: 'cafe-outline' }
                     ]
                 },
                 {
                     category: 'Concierge', items: [
-                        { name: 'Restaurant', icon: 'restaurant-outline' },
-                        { name: 'Taxi Booking', icon: 'car-outline' },
-                        { name: 'Tour Info', icon: 'map-outline' }
+                        { id: '7', name: 'Restaurant', icon: 'restaurant-outline' },
+                        { id: '8', name: 'Taxi Booking', icon: 'car-outline' },
+                        { id: '9', name: 'Tour Info', icon: 'map-outline' }
                     ]
                 }
             ];
+
+
+            const handleRequestClick = async (category: string, requestName: string) => {
+                try {
+                    const requestData = {
+                        user_id: user.userId,
+                        hotel_id: "courtyard", // Replace with the actual hotel ID
+                        department: category, // Update this with the relevant department
+                        task: requestName, // The task name from the clicked item
+                    };
+
+                    console.log("Request data = ", requestData);
+
+                    const response = await apiInstance.post(
+                        "https://p5vfoq23g5ps45rtvky2xydcxe0sbwph.lambda-url.us-east-1.on.aws/api/requests/requests",
+                        requestData,
+                        {
+                            headers: {
+                                "Content-Type": "application/json",
+                                "accept": "application/json",
+                            },
+                        }
+                    );
+
+                    console.log("Response = ", response.data);
+
+                    if (response.status === 200 || response.status === 201) {
+                        Alert.alert("Success", `Your ${requestName} request has been submitted.`);
+                    } else {
+                        throw new Error("Failed to submit request");
+                    }
+                } catch (error) {
+                    console.error(error);
+                    Alert.alert("Error", "Failed to submit request. Please try again.");
+                }
+            };
+
 
             return (
                 <ScrollView style={styles.requestsContainer}>
@@ -103,12 +147,16 @@ const TabView: React.FC<Props> = ({ activeItem }) => {
                             <ThemedText style={styles.categoryTitle}>{category.category}</ThemedText>
                             <View style={styles.requestsGrid}>
                                 {category.items.map((item) => (
-                                    <View key={item.name} style={styles.requestItem}>
+                                    <TouchableOpacity
+                                        key={item.id}
+                                        style={styles.requestItem}
+                                        onPress={() => handleRequestClick((category.category).toLowerCase(), item.name)}
+                                    >
                                         <View style={styles.requestIcon}>
                                             <Ionicons name={item.icon as any} size={24} color="black" />
                                         </View>
                                         <ThemedText style={styles.requestText}>{item.name}</ThemedText>
-                                    </View>
+                                    </TouchableOpacity>
                                 ))}
                             </View>
                         </View>
@@ -179,7 +227,11 @@ const TabView: React.FC<Props> = ({ activeItem }) => {
                 case 'Details':
                     return <DetailsTab />;
                 case 'Requests':
-                    return <RequestsTab />;
+                    return <RequestsTab activeItem={{
+                        title: '',
+                        image: 0,
+                        description: ''
+                    }} userEmail={''} />;
                 case 'Community Events':
                     return <CommunityEventsTab />;
                 default:
@@ -210,7 +262,7 @@ const TabView: React.FC<Props> = ({ activeItem }) => {
     const UpcomingTrip = () => {
         const [activeTab, setActiveTab] = useState('Details');
         const [showRecommendations, setShowRecommendations] = useState(false);
-    
+
         const DetailsTab = () => (
             <ScrollView style={styles.scrollView}>
                 <ThemedText style={styles.sectionTitle}>Upcoming Bookings</ThemedText>
@@ -250,7 +302,7 @@ const TabView: React.FC<Props> = ({ activeItem }) => {
                 ))}
             </ScrollView>
         );
-    
+
         const GetRecommendationsTab = () => (
             <ScrollView style={styles.scrollView}>
                 <TouchableOpacity
@@ -285,7 +337,7 @@ const TabView: React.FC<Props> = ({ activeItem }) => {
                 )}
             </ScrollView>
         );
-    
+
         const renderTabContent = () => {
             switch (activeTab) {
                 case 'Details':
@@ -296,7 +348,7 @@ const TabView: React.FC<Props> = ({ activeItem }) => {
                     return null;
             }
         };
-    
+
         return (
             <>
                 <View style={styles.tabContainer}>
@@ -319,7 +371,7 @@ const TabView: React.FC<Props> = ({ activeItem }) => {
 
     const PastTrip = () => {
         const [activeTab, setActiveTab] = useState('Details');
-    
+
         const DetailsTab = () => (
             <ScrollView style={styles.scrollView}>
                 <ThemedText style={styles.sectionTitle}>Past Bookings</ThemedText>
@@ -373,7 +425,7 @@ const TabView: React.FC<Props> = ({ activeItem }) => {
                 ))}
             </ScrollView>
         );
-    
+
         const ContactHotelTab = () => (
             <View style={styles.contactContainer}>
                 <ThemedText style={styles.contactTitle}>Have general inquiries about your past stay?</ThemedText>
@@ -391,7 +443,7 @@ const TabView: React.FC<Props> = ({ activeItem }) => {
                 </TouchableOpacity>
             </View>
         );
-    
+
         const renderTabContent = () => {
             switch (activeTab) {
                 case 'Details':
@@ -402,7 +454,7 @@ const TabView: React.FC<Props> = ({ activeItem }) => {
                     return null;
             }
         };
-    
+
         return (
             <>
                 <View style={styles.tabContainer}>
