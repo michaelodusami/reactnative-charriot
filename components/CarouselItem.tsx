@@ -27,12 +27,12 @@ const CarouselItem = ({ item, index, scrollX }: Props) => {
                         [-width * 0.25, 0, width * 0.25],
                         Extrapolation.CLAMP
                     )
-                }, 
+                },
                 {
                     scale: interpolate(
                         scrollX.value,
                         [(index - 1) * width, index * width, (index + 1) * width],
-                        [0.9, 1, 0.9], 
+                        [0.9, 1, 0.9],
                         Extrapolation.CLAMP
                     )
                 }
@@ -41,12 +41,22 @@ const CarouselItem = ({ item, index, scrollX }: Props) => {
     })
     return (
         <Animated.View style={[styles.itemContainer, rnAnimatedStyle]}>
-            <Image source={item.image} style={{ width: 320, height: 320, borderRadius: 20 }} />
+            <View style={{ width: 320, height: 220, borderRadius: 20, overflow: 'hidden' }}>
+                <Image source={item.image} style={{ width: '100%', height: '100%' }} />
+                <View style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    backgroundColor: 'rgba(0,0,0,0.4)', // Adjust opacity as needed
+                }} />
+            </View>
             <LinearGradient colors={['transparent', 'rgba(0, 0, 0, 0.8']} style={styles.background}>
                 <View style={{ alignItems: 'flex-end' }}>
-                    <TouchableOpacity style={styles.icon}>
+                    {/* <TouchableOpacity style={styles.icon}>
                         <Ionicons name="airplane" size={24} color={'black'} />
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                 </View>
                 <View>
                     <ThemedText style={styles.title}>{item.title}</ThemedText>
@@ -68,15 +78,15 @@ const styles = StyleSheet.create({
     },
     background: {
         position: 'absolute',
-        height: 350,
+        height: 140,
         width: 320,
         padding: 20,
         borderRadius: 20,
     },
     title: {
-        marginTop: -45,
-        width: '80%',
-        fontFamily: 'EffraFamily',
+        marginTop: -20,
+        width: '100%',
+        fontFamily: 'Poppins',
         color: '#fff',
         fontWeight: 'bold',
         fontSize: 30,
@@ -85,12 +95,12 @@ const styles = StyleSheet.create({
     description: {
         width: '84%',
         fontFamily: 'EffraFamily',
-        color: 'rgb(84, 88, 90)',
+        color: '#d7ddbb',
         fontWeight: 'bold',
         fontSize: 19
     },
     icon: {
-        marginTop: 30,
+        marginTop: 80,
         height: 40,
         width: 30
     }

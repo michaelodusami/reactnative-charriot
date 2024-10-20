@@ -3,18 +3,25 @@ import React from "react";
 import { ThemedText } from "@/components/ThemedText";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Slider from "../../components/Slider"
-import { ImageSlider } from "@/data/CarouselData";
+import { ImageSlider, ImageSliderType } from "@/data/CarouselData";
 import SafeArea from "@/components/SafeArea";
+import TabView from "@/components/TabView";
 
 const HomePage = () => {
+	const [activeItem, setActiveItem] = React.useState<ImageSliderType>(ImageSlider[0]);
+
+    const handleActiveItemChange = (item: ImageSliderType) => {
+        setActiveItem(item);
+    };
 	return (
 		<SafeArea style={styles.container}>
 			<View>
 			<ThemedText style={styles.subheading}>Make new memories</ThemedText>
 			</View>
 			<SafeAreaView style={styles.carouselContainer}>
-				<Slider itemList={ImageSlider} />
+				<Slider itemList={ImageSlider} onActiveItemChange={handleActiveItemChange}/>
 			</SafeAreaView>
+			<TabView activeItem={activeItem} />
 		</SafeArea>
 	)
 };
@@ -26,7 +33,7 @@ const styles = StyleSheet.create({
 		paddingVertical: 24
 	},
 	carouselContainer: {
-		flex: 0.6,
+		flex: 0.45,
 		alignItems: "center"
 	}, 
 	subheading: {

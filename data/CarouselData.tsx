@@ -8,16 +8,19 @@ export type ImageSliderType = {
 
 export const ImageSlider = [
     {
+        id: 0,
         title: 'Ongoing Trips',
         image: require('@/assets/images/current_trip.webp'),
         description: 'Your ongoing trip at Fairfield Inn, Blacksburg, VA'
     }, 
     {
+        id: 1,
         title: 'Upcoming Trips',
         image: require('@/assets/images/upcoming_trips.webp'),
         description: 'Explore your upcoming trips'
     }, 
     {
+        id: 2,
         title: 'Past Trips',
         image: require('@/assets/images/past_trips.webp'),
         description: 'View past trips and adventures'
