@@ -76,7 +76,7 @@ const SettingsSection = () => {
 					thumbColor={highContrastMode ? "#f4f3f4" : "#f4f3f4"}
 				/>
 			</SettingItem>
-
+			{/* 
 			<SettingItem
 				icon="volume-high"
 				title="Voice Guidance"
@@ -88,7 +88,7 @@ const SettingsSection = () => {
 					trackColor={{ false: "#767577", true: "#FA5A5A" }}
 					thumbColor={voiceGuidance ? "#f4f3f4" : "#f4f3f4"}
 				/>
-			</SettingItem>
+			</SettingItem> */}
 
 			{/* Privacy Controls Section */}
 			<ThemedText style={styles.subSectionTitle}>Privacy Controls</ThemedText>
