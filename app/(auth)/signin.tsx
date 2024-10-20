@@ -37,68 +37,63 @@ const LoginScreen: React.FC = () => {
 	}
 
 	return (
-		<ImageBackground
-			source={require("../../assets/images/background.webp")}
-			style={styles.backgroundImage}
-		>
-			<SafeAreaView style={styles.container}>
-				<View style={styles.innerContainer}>
-					<View style={styles.headingStylesContainer}>
-						<ThemedText style={styles.title}>Login here</ThemedText>
-						<ThemedText style={styles.subtitle}>Welcome to Charriot!</ThemedText>
-					</View>
-
-					<View style={styles.emailAndPasswordContainer}>
-						<View style={styles.inputContainer}>
-							<TextInput
-								style={styles.input}
-								placeholder="Email"
-								value={email}
-								onChangeText={setEmail}
-								keyboardType="email-address"
-								autoCapitalize="none"
-							/>
-						</View>
-						{email !== "" && !isEmailValid && (
-							<Text style={styles.errorText}>Please enter a valid email address</Text>
-						)}
-
-						<View style={styles.inputContainer}>
-							<TextInput
-								style={styles.input}
-								placeholder="Password"
-								value={password}
-								onChangeText={setPassword}
-								secureTextEntry
-							/>
-						</View>
-					</View>
-
-					<View style={styles.checkboxContainer}>
-						<Checkbox
-							value={isChecked}
-							onValueChange={setIsChecked}
-							color={isChecked ? "#3366FF" : undefined}
-						/>
-						<ThemedText style={styles.checkboxLabel}>
-							I agree to the{" "}
-							<ThemedText style={styles.termsText}>Terms and Conditions</ThemedText>
-						</ThemedText>
-					</View>
-
-					<Pressable
-						style={[
-							styles.signInButton,
-							(!isChecked || !validateEmail(email)) && styles.disabledButton,
-						]}
-						onPress={handleLogin}
-						disabled={!isChecked || !validateEmail(email)}
-					>
-						<ThemedText style={styles.signInButtonText}>Sign in</ThemedText>
-					</Pressable>
+		<SafeAreaView style={styles.container}>
+			<View style={styles.innerContainer}>
+				<View style={styles.headingStylesContainer}>
+					<ThemedText style={styles.title}>Login here</ThemedText>
+					<ThemedText style={styles.subtitle}>Welcome to Charriot!</ThemedText>
 				</View>
-			</SafeAreaView>
-		</ImageBackground>
+
+				<View style={styles.emailAndPasswordContainer}>
+					<View style={styles.inputContainer}>
+						<TextInput
+							style={styles.input}
+							placeholder="Email"
+							value={email}
+							onChangeText={setEmail}
+							keyboardType="email-address"
+							autoCapitalize="none"
+						/>
+					</View>
+					{email !== "" && !isEmailValid && (
+						<Text style={styles.errorText}>Please enter a valid email address</Text>
+					)}
+
+					<View style={styles.inputContainer}>
+						<TextInput
+							style={styles.input}
+							placeholder="Password"
+							value={password}
+							onChangeText={setPassword}
+							secureTextEntry
+						/>
+					</View>
+				</View>
+
+				<View style={styles.checkboxContainer}>
+					<Checkbox
+						value={isChecked}
+						onValueChange={setIsChecked}
+						color={isChecked ? "#3366FF" : undefined}
+					/>
+					<ThemedText style={styles.checkboxLabel}>
+						I agree to the{" "}
+						<ThemedText style={styles.termsText}>Terms and Conditions</ThemedText>
+					</ThemedText>
+				</View>
+
+				<Pressable
+					style={[
+						styles.signInButton,
+						(!isChecked || !validateEmail(email)) && styles.disabledButton,
+					]}
+					onPress={handleLogin}
+					disabled={!isChecked || !validateEmail(email)}
+				>
+					<ThemedText style={styles.signInButtonText}>Sign in</ThemedText>
+				</Pressable>
+			</View>
+		</SafeAreaView>
 	);
 };
 
