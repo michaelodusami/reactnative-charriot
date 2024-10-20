@@ -1,10 +1,12 @@
-import { API_URL, API_KEY } from "@env";
 import axios from "axios";
 
+const apiUrl = process.env.EXPO_PUBLIC_API_URL;
+const apiKey = process.env.EXPO_PUBLIC_API_KEY;
+
 const apiInstance = axios.create({
-	baseURL: API_URL,
+	baseURL: apiUrl,
 	headers: {
-		"API-KEY": API_KEY,
+		"API-KEY": apiKey,
 	},
 });
 
