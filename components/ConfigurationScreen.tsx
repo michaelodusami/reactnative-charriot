@@ -268,6 +268,8 @@ const configStyles = StyleSheet.create({
 	},
 	slider: {
 		alignSelf: "center",
+		width: '100%',
+		height: 40,
 	},
 	saveButton: {
 		backgroundColor: "#FA5A5A",
