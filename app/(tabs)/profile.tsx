@@ -54,7 +54,7 @@ const Profile = () => {
 					<ThemedText style={styles.editText}>EDIT PROFILE</ThemedText>
 				</TouchableOpacity> */}
 				<Image
-					source={require("../../assets/images/Chariott.png")}
+					source={require("../../assets/images/icon.png")}
 					style={styles.profileImage}
 				/>
 				<ThemedText style={styles.userName}>Kelly Peter</ThemedText>

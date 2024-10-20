@@ -14,6 +14,7 @@ export default function RootLayout() {
 	return (
 		<Stack>
 			<Stack.Screen name="welcome" options={{ headerShown: false }} />
+			<Stack.Screen name="hotelChains" options={{ headerShown: false }} />
 			<Stack.Screen name="signin" options={{ headerShown: false }} />
 		</Stack>
 	);
