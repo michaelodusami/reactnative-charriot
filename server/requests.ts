@@ -1,6 +1,15 @@
 import axios from "axios";
 import apiInstance from "./axiosInstance";
 
+export const getAllUserRequests = async (user_id: string) => {
+	try {
+		const response = await apiInstance.get("/api/requests/requests/user/" + user_id);
+		return response.data;
+	} catch (err) {
+		throw err;
+	}
+};
+
 /**
  *
  * 	Acessibilities
@@ -83,13 +92,15 @@ export const signIn = async (email: string, password: string) => {
 export const submitRequest = async (requestId: string, userEmail: string) => {
 	console.log("I have been called");
 	try {
-	  const response = await apiInstance.post(
-		`https://p5vfoq23g5ps45rtvky2xydcxe0sbwph.lambda-url.us-east-1.on.aws/api/request/${requestId}/${encodeURIComponent(userEmail)}`
-	  );
-	  console.log(response.data);
-	  return response.data;
+		const response = await apiInstance.post(
+			`https://p5vfoq23g5ps45rtvky2xydcxe0sbwph.lambda-url.us-east-1.on.aws/api/request/${requestId}/${encodeURIComponent(
+				userEmail
+			)}`
+		);
+		console.log(response.data);
+		return response.data;
 	} catch (err) {
-	  console.error("Error submitting request:", err);
-	  throw err;
+		console.error("Error submitting request:", err);
+		throw err;
 	}
-  };
+};
