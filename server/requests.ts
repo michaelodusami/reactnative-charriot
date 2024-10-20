@@ -164,3 +164,13 @@ export const submitRequest = async (requestId: string, userEmail: string) => {
 		throw err;
 	}
 };
+
+// SETTINGS
+
+export const deleteAccount = async (user_id: string) => {
+	try {
+		await apiInstance.delete("api/auth/users/" + user_id);
+	} catch (err) {
+		throw err;
+	}
+};
