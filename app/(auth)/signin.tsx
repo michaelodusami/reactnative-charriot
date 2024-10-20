@@ -6,14 +6,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 const Onboarding = () => {
 	return (
 		<SafeAreaView>
-			<ThemedText>Welcome</ThemedText>
-			<TouchableOpacity
-				onPress={() => {
-					router.replace("/(auth)/signin");
-				}}
-			>
-				<ThemedText>Explore</ThemedText>
-			</TouchableOpacity>
+			<ThemedText>Sign in</ThemedText>
 		</SafeAreaView>
 	);
 };
