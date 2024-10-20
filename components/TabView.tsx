@@ -4,16 +4,26 @@ import { ThemedText } from "@/components/ThemedText";
 import { ImageSliderType } from "@/data/CarouselData";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { getCurrnetUserBooking, getHotel, getHotelEvents, submitRequest } from "@/server/requests";
+import {
+	getCurrnetUserBooking,
+	getHotel,
+	getHotelEvents,
+	getUpcomingUserBooking,
+	submitRequest,
+} from "@/server/requests";
 import axiosInstance from "@/server/axiosInstance";
 import apiInstance from "@/server/axiosInstance";
 import { useUser } from "@/providers/UserContext"; // Import the useUser hook
-import { formatDisplayDate } from "@/server/util";
+
 import { format } from "date-fns";
 
 type Props = {
 	activeItem: ImageSliderType;
 	userEmail: string;
+};
+
+const formatDisplayDate = (dateString) => {
+	return format(new Date(dateString), "MMM d, yyyy");
 };
 
 const amenityOptions = {
@@ -61,9 +71,6 @@ const TabView: React.FC<Props> = ({ activeItem }) => {
 		}, [user.userId]);
 
 		// Helper function to format the date
-		const formatDisplayDate = (dateString) => {
-			return format(new Date(dateString), "MMM d, yyyy");
-		};
 
 		if (!currentBooking || !currentHotel) {
 			return null; // Render nothing if either of the data is not available
@@ -312,46 +319,63 @@ const TabView: React.FC<Props> = ({ activeItem }) => {
 	};
 
 	const UpcomingTrip = () => {
+		const { user } = useUser();
 		const [activeTab, setActiveTab] = useState("Details");
 		const [showRecommendations, setShowRecommendations] = useState(false);
+		const [upcomingBookings, setUpcomingBookings] = useState([]);
 
+		// Fetch upcoming bookings for the user
+		const fetchUpcomingBooking = async () => {
+			const bookingData = await getUpcomingUserBooking(user.userId);
+			console.log(bookingData);
+			setUpcomingBookings(bookingData); // Assuming the booking API returns an array
+		};
+
+		if (!upcomingBookings) {
+			return null; // Render nothing if either of the data is not available
+		}
+
+		useEffect(() => {
+			if (user.userId) {
+				fetchUpcomingBooking();
+			}
+		}, [user.userId]);
+
+		// Helper function to format the date
+		const formatDisplayDate = (dateString) => {
+			return format(new Date(dateString), "EEE, MMM d");
+		};
+
+		// DetailsTab component to show upcoming bookings
 		const DetailsTab = () => (
 			<ScrollView style={styles.scrollView}>
 				<ThemedText style={styles.sectionTitle}>Upcoming Bookings</ThemedText>
-				{[
-					{
-						hotel: "Grand Hotel",
-						city: "New York City",
-						rooms: "2 Deluxe Suites",
-						checkIn: "Fri, Sep 22",
-						checkOut: "Sun, Sep 24",
-					},
-					{
-						hotel: "Seaside Resort",
-						city: "Miami",
-						rooms: "1 Ocean View Room",
-						checkIn: "Mon, Oct 15",
-						checkOut: "Fri, Oct 19",
-					},
-				].map((booking, index) => (
+				{upcomingBookings.map((booking, index) => (
 					<View key={index} style={styles.bookingItem}>
 						<ThemedText style={styles.bookingNumber}>{index + 1}.</ThemedText>
 						<View style={styles.bookingDetails}>
 							<View style={styles.row}>
 								<Ionicons name="business-outline" size={20} color="#666" />
-								<ThemedText
-									style={styles.hotelName}
-								>{`${booking.hotel}, ${booking.city}`}</ThemedText>
+								<ThemedText style={styles.hotelName}>
+									{`${
+										booking.hotel_name.charAt(0) + booking.hotel_name.slice(1)
+									}, ${booking.hotel_id}`}{" "}
+									{/* Display hotel name */}
+								</ThemedText>
 							</View>
 							<View style={styles.row}>
 								<Ionicons name="bed-outline" size={20} color="#666" />
-								<ThemedText style={styles.roomInfo}>{booking.rooms}</ThemedText>
+								<ThemedText style={styles.roomInfo}>
+									{`${booking.room_info.beds} ${booking.room_info.size} Room`}
+								</ThemedText>
 							</View>
 							<View style={styles.row}>
 								<Ionicons name="calendar-outline" size={20} color="#666" />
-								<ThemedText
-									style={styles.dateInfo}
-								>{`${booking.checkIn} to ${booking.checkOut}`}</ThemedText>
+								<ThemedText style={styles.dateInfo}>
+									{`${formatDisplayDate(
+										booking.start_date
+									)} to ${formatDisplayDate(booking.end_date)}`}
+								</ThemedText>
 							</View>
 						</View>
 					</View>
@@ -359,6 +383,7 @@ const TabView: React.FC<Props> = ({ activeItem }) => {
 			</ScrollView>
 		);
 
+		// GetRecommendationsTab to display trip recommendations
 		const GetRecommendationsTab = () => (
 			<ScrollView style={styles.scrollView}>
 				<TouchableOpacity
@@ -400,6 +425,7 @@ const TabView: React.FC<Props> = ({ activeItem }) => {
 			</ScrollView>
 		);
 
+		// Renders the selected tab's content
 		const renderTabContent = () => {
 			switch (activeTab) {
 				case "Details":
@@ -411,6 +437,7 @@ const TabView: React.FC<Props> = ({ activeItem }) => {
 			}
 		};
 
+		// Main component rendering tabs and content
 		return (
 			<>
 				<View style={styles.tabContainer}>

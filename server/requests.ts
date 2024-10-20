@@ -19,27 +19,45 @@ export const getCurrnetUserBooking = async (user_id: string) => {
 	}
 };
 
-export const getHotel = async (user_id: string) => {
+export const getUpcomingUserBooking = async (user_id: string) => {
 	try {
-		const currentbooking = await getCurrnetUserBooking(user_id);
-		const response = await apiInstance.get("/api/hotels/hotels/" + currentbooking[0].hotel_id);
-		console.log(response.data);
+		const response = await apiInstance.get("/api/bookings/bookings/future/" + user_id);
 		return response.data;
 	} catch (err) {
 		throw err;
 	}
 };
 
-export const getHotelEventsForCurrentBookings = async (userId: string) => {
+export const getCurrentBookingHotel = async (user_id: string) => {
 	try {
-		const hotel = await getHotel(userId);
-		const events = hotel["local_community_projects"];
-		console.log(events);
-		//return response.data;
+		const currentbooking = await getCurrnetUserBooking(user_id);
+		const response = await apiInstance.get("/api/hotels/hotels/" + currentbooking[0].hotel_id);
+		//console.log(response.data);
+		return response.data;
 	} catch (err) {
 		throw err;
 	}
 };
+
+export const getUpcomingBookingHotel = async (hotel_id: string) => {
+	try {
+		const response = await apiInstance.get("/api/hotels/hotels/" + hotel_id);
+		return response.data;
+	} catch (err) {
+		throw err;
+	}
+};
+
+// export const getHotelEventsForCurrentBookings = async (userId: string) => {
+// 	try {
+// 		const hotel = await getHotel(userId);
+// 		const events = hotel["local_community_projects"];
+// 		//console.log(events);
+// 		//return response.data;
+// 	} catch (err) {
+// 		throw err;
+// 	}
+// };
 
 // getHotelEventsForCurrentBookings("dhruv@example.com");
 
@@ -116,14 +134,14 @@ const authEndPoints = {
 };
 
 export const signIn = async (email: string, password: string) => {
-	console.log(`Signing in ${email} and ${password}...\n`);
+	//console.log(`Signing in ${email} and ${password}...\n`);
 	try {
 		const requestBody = {
 			email: email,
 			password: password,
 		};
 		const response = await apiInstance.post(authEndPoints.signin, requestBody);
-		console.log(response.data);
+		//console.log(response.data);
 		return response.data.access_token;
 	} catch (err) {
 		console.error("Error" + err);
@@ -139,7 +157,7 @@ export const submitRequest = async (requestId: string, userEmail: string) => {
 				userEmail
 			)}`
 		);
-		console.log(response.data);
+		//console.log(response.data);
 		return response.data;
 	} catch (err) {
 		console.error("Error submitting request:", err);
