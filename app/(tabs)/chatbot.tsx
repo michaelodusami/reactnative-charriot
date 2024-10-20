@@ -244,7 +244,7 @@ const ChatBotScreen = () => {
 const styles = StyleSheet.create({
 	container: {
 		paddingHorizontal: 16,
-		paddingVertical: 24,
+		paddingVertical: 16,
 	},
 	header: {
 		marginTop: 16,

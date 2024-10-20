@@ -1,16 +1,19 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Switch } from "react-native";
+import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Switch, TextInput } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { Alert } from "react-native";
+import { Alert} from "react-native";
+import Slider from '@react-native-community/slider';
 
 const ConfigurationSection = () => {
-	const [temperature, setTemperature] = useState(24);
+	const [temperature, setTemperature] = useState(70);
 	const [coffeeMachine, setCoffeeMachine] = useState(true);
 	const [extraBlanket, setExtraBlanket] = useState(true);
 	const [quietRoom, setQuietRoom] = useState(true);
-
+	const [economicRating, setEconomicRating] = useState(5);
+	const [extraBedding, setExtraBedding] = useState('');
+	const [selectedOptions, setSelectedOptions] = useState({});
 	const handleSave = () => {
 		// Here you would typically save the configuration to your backend or local storage
 		Alert.alert("Success", "Your preferences have been saved successfully!");
@@ -49,15 +52,15 @@ const ConfigurationSection = () => {
 			</ConfigItem>
 
 			{/* Room Temperature Preference */}
-			{/* <ConfigItem
+			<ConfigItem
 				icon="thermometer"
 				title="Preferred Room Temperature"
-				description={`Current setting: ${temperature}°C`}
+				description="What temperature settings do you prefer in the room?"
 			>
 				<Slider
 					style={configStyles.slider}
-					minimumValue={18}
-					maximumValue={30}
+					minimumValue={0}
+					maximumValue={100}
 					step={1}
 					value={temperature}
 					onValueChange={setTemperature}
@@ -65,7 +68,8 @@ const ConfigurationSection = () => {
 					maximumTrackTintColor="#000000"
 					thumbTintColor="#FA5A5A"
 				/>
-			</ConfigItem> */}
+				<ThemedText style={configStyles.sliderValue}>{temperature}°F</ThemedText>
+			</ConfigItem>
 
 			{/* Coffee Machine in Room */}
 			<ConfigItem
@@ -82,6 +86,26 @@ const ConfigurationSection = () => {
 				/>
 			</ConfigItem>
 
+			{/* Economic Rating */}
+			<ConfigItem
+				icon="cash"
+				title="Preferred Minimum Economic Rating"
+				description="Select your preferred minimum economic rating"
+			>
+				<Slider
+					style={configStyles.slider}
+					minimumValue={0}
+					maximumValue={10}
+					step={1}
+					value={economicRating}
+					onValueChange={setEconomicRating}
+					minimumTrackTintColor="#FA5A5A"
+					maximumTrackTintColor="#000000"
+					thumbTintColor="#FA5A5A"
+				/>
+				<ThemedText style={configStyles.sliderValue}>{economicRating}</ThemedText>
+			</ConfigItem>
+
 			{/* Extra Blanket */}
 			<ConfigItem
 				icon="more"
@@ -94,6 +118,21 @@ const ConfigurationSection = () => {
 					onValueChange={setExtraBlanket}
 					trackColor={{ false: "#767577", true: "#FA5A5A" }}
 					thumbColor={extraBlanket ? "#f4f3f4" : "#f4f3f4"}
+				/>
+			</ConfigItem>
+
+			{/* Extra Bedding Needs */}
+			<ConfigItem
+				icon="bed-queen"
+				title="Extra Bedding Needs"
+				description="Any extra bedding needs?"
+			>
+				<TextInput
+					style={configStyles.textInput}
+					value={extraBedding}
+					onChangeText={setExtraBedding}
+					placeholder="Enter your extra bedding needs"
+					placeholderTextColor="#999"
 				/>
 			</ConfigItem>
 
@@ -241,6 +280,21 @@ const configStyles = StyleSheet.create({
 		color: "#FFFFFF",
 		fontSize: 18,
 		fontWeight: "bold",
+	},
+	selectedOption: {
+		backgroundColor: "#FA5A5A",
+	},
+	sliderValue: {
+		textAlign: 'center',
+		marginTop: 10,
+	},
+	textInput: {
+		borderWidth: 1,
+		borderColor: '#ccc',
+		borderRadius: 5,
+		padding: 10,
+		fontSize: 16,
+		width: '100%',
 	},
 });
 
