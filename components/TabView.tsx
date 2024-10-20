@@ -1,23 +1,73 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, TouchableOpacity, StyleSheet, ScrollView, Image, Alert } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import { ImageSliderType } from "@/data/CarouselData";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { submitRequest } from "@/server/requests";
+import { getCurrnetUserBooking, getHotel, getHotelEvents, submitRequest } from "@/server/requests";
 import axiosInstance from "@/server/axiosInstance";
 import apiInstance from "@/server/axiosInstance";
 import { useUser } from "@/providers/UserContext"; // Import the useUser hook
+import { formatDisplayDate } from "@/server/util";
+import { format } from "date-fns";
 
 type Props = {
 	activeItem: ImageSliderType;
 	userEmail: string;
 };
 
+const amenityOptions = {
+	breakfast: { name: "Breakfast available", icon: "restaurant-outline" },
+	bar: { name: "Bar", icon: "wine-outline" },
+	room_service: { name: "Room service", icon: "cart-outline" },
+	pet_friendly: { name: "Pet friendly", icon: "paw-outline" },
+	front_desk_24_7: { name: "24/7 front desk", icon: "time-outline" },
+	parking: { name: "Parking available", icon: "car-outline" },
+};
+
 const TabView: React.FC<Props> = ({ activeItem }) => {
+	const { user } = useUser();
 	const [activeTab, setActiveTab] = useState("Details");
+
 	const OngoingTrip = () => {
+		const [currentBooking, setCurrentBooking] = useState(null);
+		const [currentHotel, setCurrentHotel] = useState(null);
+
 		const [expandedEvent, setExpandedEvent] = useState<number | null>(null);
+
+		const fetchCurrentBooking = async () => {
+			try {
+				const booking = await getCurrnetUserBooking(user.userId);
+				setCurrentBooking(booking[0]); // Assuming the booking API returns an array
+			} catch (error) {
+				console.error("Failed to fetch current booking:", error);
+			}
+		};
+
+		const fetchCurrentHotel = async () => {
+			try {
+				const hotel = await getHotel(user.userId);
+				setCurrentHotel(hotel);
+			} catch (error) {
+				console.error("Failed to fetch current hotel:", error);
+			}
+		};
+
+		useEffect(() => {
+			if (user.userId) {
+				fetchCurrentBooking();
+				fetchCurrentHotel();
+			}
+		}, [user.userId]);
+
+		// Helper function to format the date
+		const formatDisplayDate = (dateString) => {
+			return format(new Date(dateString), "MMM d, yyyy");
+		};
+
+		if (!currentBooking || !currentHotel) {
+			return null; // Render nothing if either of the data is not available
+		}
 
 		const DetailsTab = () => (
 			<View style={styles.detailsContainer}>
@@ -26,7 +76,9 @@ const TabView: React.FC<Props> = ({ activeItem }) => {
 						<ThemedText style={styles.dateLabel}>Check-In</ThemedText>
 						<View style={styles.dateCalendarStyle}>
 							<Ionicons name="calendar-outline" size={24} color="black" />
-							<ThemedText style={styles.dateText}>July 15, 2024</ThemedText>
+							<ThemedText style={styles.dateText}>
+								{formatDisplayDate(currentBooking.start_date)}
+							</ThemedText>
 						</View>
 					</View>
 					<View style={styles.verticalDivider} />
@@ -34,7 +86,9 @@ const TabView: React.FC<Props> = ({ activeItem }) => {
 						<ThemedText style={styles.dateLabel}>Check-Out</ThemedText>
 						<View style={styles.dateCalendarStyle}>
 							<Ionicons name="calendar-outline" size={24} color="black" />
-							<ThemedText style={styles.dateText}>July 15, 2024</ThemedText>
+							<ThemedText style={styles.dateText}>
+								{formatDisplayDate(currentBooking.end_date)}
+							</ThemedText>
 						</View>
 					</View>
 				</View>
@@ -43,42 +97,48 @@ const TabView: React.FC<Props> = ({ activeItem }) => {
 					<View style={styles.roomDetails}>
 						<View style={styles.roomDetailItem}>
 							<Ionicons name="bed-outline" size={24} color="black" />
-							<ThemedText style={styles.roomDetailText}>2 Beds</ThemedText>
+							<ThemedText style={styles.roomDetailText}>
+								{currentBooking.room_info.beds} Beds
+							</ThemedText>
 						</View>
 						<View style={styles.roomDetailItem}>
 							<Ionicons name="water-outline" size={24} color="black" />
-							<ThemedText style={styles.roomDetailText}>1 Bathroom</ThemedText>
+							<ThemedText style={styles.roomDetailText}>
+								{currentBooking.room_info.bathrooms} Bathrooms
+							</ThemedText>
 						</View>
 						<View style={styles.roomDetailItem}>
 							<Ionicons name="resize-outline" size={24} color="black" />
-							<ThemedText style={styles.roomDetailText}>King Size Room</ThemedText>
+							<ThemedText style={styles.roomDetailText}>
+								{currentBooking.room_info.size} Size Room
+							</ThemedText>
 						</View>
 					</View>
 				</View>
 				<View style={styles.amenitiesContainer}>
 					<ThemedText style={styles.sectionTitle}>Amenities</ThemedText>
 					<View style={styles.amenitiesGrid}>
-						{[
-							{ name: "Breakfast available", icon: "restaurant-outline" },
-							{ name: "Bar", icon: "wine-outline" },
-							{ name: "Room service", icon: "cart-outline" },
-							{ name: "Pet friendly", icon: "paw-outline" },
-							{ name: "24/7 front desk", icon: "time-outline" },
-							{ name: "Parking available", icon: "car-outline" },
-						].map((amenity, index) => (
-							<View key={index} style={styles.amenityItem}>
-								<Ionicons name={amenity.icon as any} size={24} color="black" />
-								<ThemedText style={styles.amenityText}>{amenity.name}</ThemedText>
-							</View>
-						))}
+						{Object.keys(currentHotel.amenities)
+							.filter((key) => currentHotel.amenities[key]) // Only include amenities that are true
+							.map((key, index) => {
+								const amenity = amenityOptions[key];
+								if (!amenity) return null; // Skip if no matching display option is found
+
+								return (
+									<View key={index} style={styles.amenityItem}>
+										<Ionicons name={amenity.icon} size={24} color="black" />
+										<ThemedText style={styles.amenityText}>
+											{amenity.name}
+										</ThemedText>
+									</View>
+								);
+							})}
 					</View>
 				</View>
 			</View>
 		);
 
 		const RequestsTab: React.FC<Props> = ({ activeItem, userEmail }) => {
-			const { user } = useUser();
-
 			const services = [
 				{
 					category: "Maintenance",
@@ -180,51 +240,18 @@ const TabView: React.FC<Props> = ({ activeItem }) => {
 		};
 
 		const CommunityEventsTab = () => {
-			const events = [
-				{
-					id: 1,
-					title: "Summer Music Festival",
-					image: require("@/assets/images/community.jpeg"),
-					description:
-						"Join us for a weekend of live music performances featuring local and international artists. Food trucks and craft vendors will be present. Date: August 15-16, 2024, at Central Park.",
-				},
-				{
-					id: 2,
-					title: "Annual Charity Run",
-					image: require("@/assets/images/community.jpeg"),
-					description:
-						"Participate in our 5K run to raise funds for local children's hospitals. All fitness levels welcome. Date: September 5, 2024, starting at City Hall Plaza.",
-				},
-				{
-					id: 3,
-					title: "Art in the Park",
-					image: require("@/assets/images/community.jpeg"),
-					description:
-						"Explore works from local artists at our open-air art exhibition. Live demonstrations and workshops available. Date: July 22-23, 2024, at Riverside Park.",
-				},
-				{
-					id: 4,
-					title: "Food and Wine Festival",
-					image: require("@/assets/images/community.jpeg"),
-					description:
-						"Savor cuisines from around the world and taste wines from local vineyards. Cooking demonstrations by celebrity chefs included. Date: October 8-10, 2024, at the Convention Center.",
-				},
-			];
-
 			return (
 				<ScrollView style={styles.eventsContainer}>
-					{events.map((event) => (
+					{currentHotel.local_community_projects.map((project, index) => (
 						<TouchableOpacity
-							key={event.id}
+							key={index}
 							style={styles.eventItem}
-							onPress={() =>
-								setExpandedEvent(expandedEvent === event.id ? null : event.id)
-							}
+							onPress={() => setExpandedEvent(expandedEvent === index ? null : index)}
 						>
 							<View style={styles.eventHeader}>
 								<Ionicons
 									name={
-										expandedEvent === event.id
+										expandedEvent === index
 											? "chevron-down-outline"
 											: "chevron-forward-outline"
 									}
@@ -232,12 +259,15 @@ const TabView: React.FC<Props> = ({ activeItem }) => {
 									color="black"
 									style={styles.eventIcon}
 								/>
-								<Image source={event.image} style={styles.eventPhoto} />
-								<ThemedText style={styles.eventTitle}>{event.title}</ThemedText>
+								<Image
+									source={{ uri: project.image_url }}
+									style={styles.eventPhoto}
+								/>
+								<ThemedText style={styles.eventTitle}>{project.title}</ThemedText>
 							</View>
-							{expandedEvent === event.id && (
+							{expandedEvent === index && (
 								<ThemedText style={styles.eventDescription}>
-									{event.description}
+									{project.description}
 								</ThemedText>
 							)}
 						</TouchableOpacity>
@@ -251,16 +281,7 @@ const TabView: React.FC<Props> = ({ activeItem }) => {
 				case "Details":
 					return <DetailsTab />;
 				case "Requests":
-					return (
-						<RequestsTab
-							activeItem={{
-								title: "",
-								image: 0,
-								description: "",
-							}}
-							userEmail={""}
-						/>
-					);
+					return <RequestsTab />;
 				case "Community Events":
 					return <CommunityEventsTab />;
 				default:

@@ -10,9 +10,49 @@ export const getAllUserRequests = async (user_id: string) => {
 	}
 };
 
+export const getCurrnetUserBooking = async (user_id: string) => {
+	try {
+		const response = await apiInstance.get("/api/bookings/bookings/current/" + user_id);
+		return response.data;
+	} catch (err) {
+		throw err;
+	}
+};
+
+export const getHotel = async (user_id: string) => {
+	try {
+		const currentbooking = await getCurrnetUserBooking(user_id);
+		const response = await apiInstance.get("/api/hotels/hotels/" + currentbooking[0].hotel_id);
+		console.log(response.data);
+		return response.data;
+	} catch (err) {
+		throw err;
+	}
+};
+
+export const getHotelEventsForCurrentBookings = async (userId: string) => {
+	try {
+		const hotel = await getHotel(userId);
+		const events = hotel["local_community_projects"];
+		console.log(events);
+		//return response.data;
+	} catch (err) {
+		throw err;
+	}
+};
+
+// getHotelEventsForCurrentBookings("dhruv@example.com");
+
+/**
+ *
+ * {"amenities": {"bar": true, "breakfast": true, "front_desk_24_7": true, "parking": true, "pet_friendly": false, "room_service": true}, "chain_id": "dhruv", "eco_rating": 10, "hotel_id": "13dfa963-d69d-4feb-8714-bae9b2c81811", "local_community_projects": [{"description": "Join fellow volunteers in cleaning up local beaches and protecting marine wildlife.", "image_url": "https://chariott-assets.s3.amazonaws.com/lcp1.png", "title": "Beach Cleanup: Make Our Shores Shine!"}, {"description": "Assist in sorting, packing, and distributing food to families in need at the local food bank.", "image_url": "https://chariott-assets.s3.amazonaws.com/lcp2.png", "title": "Food Bank Drive: Help Fight Hunger in Your Community!"}], "location": {"city": "Miami", "country": "US", "state": "Florida"}, "name": "courtyard"}
+ *
+ */
+
 /**
  *
  * 	Acessibilities
+ *
  */
 
 // get the current users acessiblity and load it
@@ -39,7 +79,7 @@ const preferencesEndPoints = {
 
 export const updateUserPreferences = async (userId: string, preferences: any) => {
 	try {
-		console.log("Preferences = ",preferences);
+		console.log("Preferences = ", preferences);
 		console.log("User ID = ", userId);
 		const response = await apiInstance.put(
 			`https://p5vfoq23g5ps45rtvky2xydcxe0sbwph.lambda-url.us-east-1.on.aws/api/auth/users/${userId}/preferences`,
