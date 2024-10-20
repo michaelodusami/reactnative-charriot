@@ -35,6 +35,16 @@ const amenityOptions = {
 	parking: { name: "Parking available", icon: "car-outline" },
 };
 
+// Utility function to format the date
+const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+        weekday: 'short', // e.g., "Fri"
+        month: 'short',   // e.g., "Sep"
+        day: '2-digit'    // e.g., "22"
+    });
+};
+
 const TabView: React.FC<Props> = ({ activeItem }) => {
 	const { user } = useUser();
 	const [activeTab, setActiveTab] = useState("Details");
