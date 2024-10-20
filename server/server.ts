@@ -309,6 +309,7 @@ export const createHotel = async (hotelData: object) => {
 export const getHotelById = async (hotel_id: string) => {
 	try {
 		const response = await apiInstance.get(`/api/hotels/hotels/${hotel_id}`);
+		console.log(response.data);
 		return response.data;
 	} catch (err) {
 		throw err;

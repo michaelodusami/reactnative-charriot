@@ -16,7 +16,7 @@ import apiInstance from "@/server/axiosInstance";
 import { useUser } from "@/providers/UserContext"; // Import the useUser hook
 
 import { format } from "date-fns";
-import { getCurrentBookings } from "@/server/server";
+import { getCurrentBookings, getHotelById } from "@/server/server";
 
 type Props = {
 	activeItem: ImageSliderType;
@@ -58,7 +58,8 @@ const TabView: React.FC<Props> = ({ activeItem }) => {
 
 		const fetchCurrentHotel = async () => {
 			try {
-				const hotel = await getHotel(user.userId);
+				//console.log(currentBooking);
+				const hotel = await getHotelById(currentBooking.hotel_id);
 				setCurrentHotel(hotel);
 			} catch (error) {
 				console.error("Failed to fetch current hotel:", error);
@@ -68,9 +69,13 @@ const TabView: React.FC<Props> = ({ activeItem }) => {
 		useEffect(() => {
 			if (user.userId) {
 				fetchCurrentBooking();
-				fetchCurrentHotel();
+				//fetchCurrentHotel();
 			}
 		}, [user.userId]);
+
+		useEffect(() => {
+			fetchCurrentHotel();
+		}, [currentBooking]);
 
 		// Helper function to format the date
 
