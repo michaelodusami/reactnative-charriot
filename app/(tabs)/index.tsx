@@ -21,7 +21,7 @@ const HomePage = () => {
 			<SafeAreaView style={styles.carouselContainer}>
 				<Slider itemList={ImageSlider} onActiveItemChange={handleActiveItemChange}/>
 			</SafeAreaView>
-			<TabView activeItem={activeItem} />
+			<TabView activeItem={activeItem} userEmail=""/>
 		</SafeArea>
 	)
 };
