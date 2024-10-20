@@ -30,10 +30,10 @@ export default HomePage;
 
 const styles = StyleSheet.create({
 	container: {
-		paddingVertical: 24
+		paddingTop: 12
 	},
 	carouselContainer: {
-		flex: 0.45,
+		flex: 0.6,
 		alignItems: "center"
 	}, 
 	subheading: {

@@ -119,13 +119,15 @@ const styles = StyleSheet.create({
 		marginBottom: 20,
 	},
 	userName: {
-		fontSize: 20,
+		fontFamily: 'EffraFamily',
+		fontSize: 22,
 		fontWeight: "bold",
 		marginBottom: 10,
 	},
 	email: {
-		// color: "#666",
-		fontSize: 14,
+		color: "#666",
+		fontFamily: 'EffraFamily',
+		fontSize: 16,
 	},
 	tabContainer: {
 		flexDirection: "row",
@@ -142,7 +144,7 @@ const styles = StyleSheet.create({
 		borderBottomColor: "#FA5A5A",
 	},
 	tabText: {
-		fontSize: 14,
+		fontSize: 16,
 		fontWeight: "bold",
 	},
 	activeTabText: {
@@ -158,7 +160,8 @@ const styles = StyleSheet.create({
 		padding: 15,
 	},
 	sectionTitle: {
-		fontSize: 16,
+		fontFamily: 'EffraFamily',
+		fontSize: 22,
 		fontWeight: "bold",
 		marginBottom: 10,
 	},
@@ -177,6 +180,7 @@ const styles = StyleSheet.create({
 	saveButtonText: {
 		color: "black",
 		fontWeight: "bold",
+		fontFamily: 'EffraFamily',
 		fontSize: 16,
 	},
 	optionRow: {
@@ -199,7 +203,8 @@ const styles = StyleSheet.create({
 		backgroundColor: "#FA5A5A",
 	},
 	optionText: {
-		fontSize: 14,
+		fontFamily: 'EffraFamily',
+		fontSize: 28,
 		fontWeight: "bold",
 		color: "#333",
 	},

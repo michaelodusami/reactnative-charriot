@@ -11,7 +11,7 @@ export const ImageSlider = [
         id: 0,
         title: 'Ongoing Trips',
         image: require('@/assets/images/current_trip.webp'),
-        description: 'Your ongoing trip at Fairfield Inn, Blacksburg, VA'
+        description: 'Your ongoing trip at Miami, Florida'
     }, 
     {
         id: 1,
