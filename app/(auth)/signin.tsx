@@ -25,10 +25,6 @@ const LoginScreen: React.FC = () => {
 		return re.test(email);
 	};
 
-	useEffect(() => {
-		setIsEmailValid(validateEmail(email));
-	}, [email]);
-
 	const handleLogin = () => {
 		console.log("Login pressed");
 		// endpoint --
@@ -49,9 +45,7 @@ const LoginScreen: React.FC = () => {
 				<View style={styles.innerContainer}>
 					<View style={styles.headingStylesContainer}>
 						<ThemedText style={styles.title}>Login here</ThemedText>
-						<ThemedText style={styles.subtitle}>
-							Welcome back we're glad to have you!
-						</ThemedText>
+						<ThemedText style={styles.subtitle}>Welcome to Charriot!</ThemedText>
 					</View>
 
 					<View style={styles.emailAndPasswordContainer}>
@@ -93,9 +87,12 @@ const LoginScreen: React.FC = () => {
 					</View>
 
 					<Pressable
-						style={[styles.signInButton, !isChecked && styles.disabledButton]}
+						style={[
+							styles.signInButton,
+							(!isChecked || !validateEmail(email)) && styles.disabledButton,
+						]}
 						onPress={handleLogin}
-						disabled={!isChecked}
+						disabled={!isChecked || !validateEmail(email)}
 					>
 						<ThemedText style={styles.signInButtonText}>Sign in</ThemedText>
 					</Pressable>

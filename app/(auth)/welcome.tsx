@@ -9,7 +9,7 @@ const Onboarding = () => {
 	return (
 		<SafeAreaView style={styles.container}>
 			<ImageBackground
-				source={require("@/assets/images/PeregrineAppLogo.png")}
+				source={require("@/assets/images/charriot.png")}
 				style={styles.background}
 				resizeMode="contain"
 			>
