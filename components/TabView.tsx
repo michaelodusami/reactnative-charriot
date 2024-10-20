@@ -16,13 +16,14 @@ import apiInstance from "@/server/axiosInstance";
 import { useUser } from "@/providers/UserContext"; // Import the useUser hook
 
 import { format } from "date-fns";
+import { getCurrentBookings } from "@/server/server";
 
 type Props = {
 	activeItem: ImageSliderType;
 	userEmail: string;
 };
 
-const formatDisplayDate = (dateString) => {
+const formatDisplayDate = (dateString: string) => {
 	return format(new Date(dateString), "MMM d, yyyy");
 };
 
@@ -47,7 +48,8 @@ const TabView: React.FC<Props> = ({ activeItem }) => {
 
 		const fetchCurrentBooking = async () => {
 			try {
-				const booking = await getCurrnetUserBooking(user.userId);
+				//const booking = await getCurrnetUserBooking(user.userId);
+				const booking = await getCurrentBookings(user.userId);
 				setCurrentBooking(booking[0]); // Assuming the booking API returns an array
 			} catch (error) {
 				console.error("Failed to fetch current booking:", error);
