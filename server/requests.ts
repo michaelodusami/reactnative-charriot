@@ -35,7 +35,7 @@ export const getLocationForHotel = async (hotelId: string) => {
 	} catch (err) {
 		throw err;
 	}
-}
+};
 
 export const getPastUserBookings = async (user_id: string) => {
 	try {
@@ -187,7 +187,8 @@ export const submitRequest = async (requestId: string, userEmail: string) => {
 
 export const deleteAccount = async (user_id: string) => {
 	try {
-		await apiInstance.delete("api/auth/users/" + user_id);
+		const resp = await apiInstance.delete("api/auth/users/" + user_id);
+		return resp;
 	} catch (err) {
 		throw err;
 	}

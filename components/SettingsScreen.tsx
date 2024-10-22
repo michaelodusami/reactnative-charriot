@@ -1,10 +1,23 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, Switch, TouchableOpacity, Alert, ScrollView } from "react-native";
+import {
+	View,
+	Text,
+	StyleSheet,
+	Switch,
+	TouchableOpacity,
+	Alert,
+	ScrollView,
+	Pressable,
+} from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { deleteAccount } from "@/server/requests";
+import { useUser } from "@/providers/UserContext";
+import { Redirect } from "expo-router";
 
 const SettingsSection = () => {
+	const { user } = useUser();
 	const [textSize, setTextSize] = useState(16);
 	const [dyslexiaMode, setDyslexiaMode] = useState(false);
 	const [highContrastMode, setHighContrastMode] = useState(false);
@@ -21,7 +34,12 @@ const SettingsSection = () => {
 				},
 				{
 					text: "Delete",
-					onPress: () => console.log("Delete account"),
+					onPress: async () => {
+						const response = await deleteAccount(user.userId);
+						if (response) {
+							<Redirect href={"/(auth)/welcome"} />;
+						}
+					},
 					style: "destructive",
 				},
 			]
@@ -96,12 +114,14 @@ const SettingsSection = () => {
 			<ThemedView style={styles.settingItem}>
 				<View style={styles.settingHeader}>
 					<Icon name={"account-remove"} size={24} color="#FA5A5A" style={styles.icon} />
-					<View style={styles.settingTitleContainer}>
-						<ThemedText style={styles.settingTitle}>{"Delete Account"}</ThemedText>
-						<ThemedText style={styles.settingDescription}>
-							{"Permanently remove your account from the app system"}
-						</ThemedText>
-					</View>
+					<Pressable onPress={handleDeleteAccount}>
+						<View style={styles.settingTitleContainer}>
+							<ThemedText style={styles.settingTitle}>{"Delete Account"}</ThemedText>
+							<ThemedText style={styles.settingDescription}>
+								{"Permanently remove your account from the app system"}
+							</ThemedText>
+						</View>
+					</Pressable>
 				</View>
 			</ThemedView>
 		</ScrollView>
