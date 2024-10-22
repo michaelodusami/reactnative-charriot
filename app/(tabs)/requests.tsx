@@ -37,6 +37,7 @@ const RequestsTab: React.FC = () => {
 	const fetchRequests = useCallback(async () => {
 		try {
 			const response = await getAllUserRequests(user.userId);
+			console.log("Response = ", response);
 			setRequests(response);
 		} catch (error) {
 			console.error("Failed to fetch requests:", error);
