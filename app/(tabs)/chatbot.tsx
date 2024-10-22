@@ -12,6 +12,7 @@ import {
 	sendChatMessage,
 	getUserInteractions,
 } from "@/server/server";
+import { capitalizeAndGetUsername } from "@/functions/userFunctions";
 
 const quickActionsMap: any = {
 	current: [
@@ -260,7 +261,7 @@ const ChatBotScreen = () => {
 			</TouchableOpacity>
 			<View style={styles.header}>
 				<ThemedText style={styles.greetingText}>
-					Hey, {user.userId.substring(0, user.userId.indexOf("@")).toUpperCase()}
+					Hey, {capitalizeAndGetUsername(user.userId)}
 				</ThemedText>
 				<ThemedText style={styles.subHeadingText}>How can I help you today?</ThemedText>
 			</View>

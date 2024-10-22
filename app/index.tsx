@@ -1,8 +1,14 @@
 import React from "react";
 import { View, Text, Pressable, StyleSheet, ImageBackground } from "react-native";
 import { Redirect, router } from "expo-router";
+import { useUser } from "@/providers/UserContext";
 
 const Home = () => {
+	const { user } = useUser();
+	if (user.userId && user.accessToken) {
+		return <Redirect href={"/(tabs)/"} />;
+	}
+
 	return <Redirect href={"/(auth)/welcome"} />;
 };
 

@@ -14,6 +14,7 @@ import { ThemedView } from "@/components/ThemedView";
 import ConfigurationSection from "@/components/ConfigurationScreen";
 import SettingsSection from "@/components/SettingsScreen";
 import { useUser } from "@/providers/UserContext";
+import { capitalizeAndGetUsername } from "@/functions/userFunctions";
 // Section Components
 
 // const PersonalInfoSection = () => (
@@ -62,7 +63,7 @@ const Profile = () => {
 					style={styles.profileImage}
 				/>
 				<ThemedText style={styles.userName}>
-					{user.userId.substring(0, user.userId.indexOf("@")).toUpperCase()}
+					{capitalizeAndGetUsername(user.userId)}
 				</ThemedText>
 				<ThemedText style={styles.email}>{user.userId}</ThemedText>
 			</View>
@@ -119,14 +120,14 @@ const styles = StyleSheet.create({
 		marginBottom: 20,
 	},
 	userName: {
-		fontFamily: 'EffraFamily',
+		fontFamily: "EffraFamily",
 		fontSize: 22,
 		fontWeight: "bold",
 		marginBottom: 10,
 	},
 	email: {
 		color: "#666",
-		fontFamily: 'EffraFamily',
+		fontFamily: "EffraFamily",
 		fontSize: 16,
 	},
 	tabContainer: {
@@ -160,7 +161,7 @@ const styles = StyleSheet.create({
 		padding: 15,
 	},
 	sectionTitle: {
-		fontFamily: 'EffraFamily',
+		fontFamily: "EffraFamily",
 		fontSize: 22,
 		fontWeight: "bold",
 		marginBottom: 10,
@@ -180,7 +181,7 @@ const styles = StyleSheet.create({
 	saveButtonText: {
 		color: "black",
 		fontWeight: "bold",
-		fontFamily: 'EffraFamily',
+		fontFamily: "EffraFamily",
 		fontSize: 16,
 	},
 	optionRow: {
@@ -203,7 +204,7 @@ const styles = StyleSheet.create({
 		backgroundColor: "#FA5A5A",
 	},
 	optionText: {
-		fontFamily: 'EffraFamily',
+		fontFamily: "EffraFamily",
 		fontSize: 28,
 		fontWeight: "bold",
 		color: "#333",

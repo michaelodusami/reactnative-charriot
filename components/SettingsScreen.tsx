@@ -17,7 +17,7 @@ import { useUser } from "@/providers/UserContext";
 import { Redirect } from "expo-router";
 
 const SettingsSection = () => {
-	const { user } = useUser();
+	const { user, clearUser } = useUser();
 	const [textSize, setTextSize] = useState(16);
 	const [dyslexiaMode, setDyslexiaMode] = useState(false);
 	const [highContrastMode, setHighContrastMode] = useState(false);
@@ -37,6 +37,7 @@ const SettingsSection = () => {
 					onPress: async () => {
 						const response = await deleteAccount(user.userId);
 						if (response) {
+							clearUser();
 							<Redirect href={"/(auth)/welcome"} />;
 						}
 					},
