@@ -240,6 +240,7 @@ export const deleteBooking = async (booking_id: string) => {
 export const getCurrentBookings = async (user_id: string) => {
 	try {
 		const response = await apiInstance.get(`/api/bookings/bookings/current/${user_id}`);
+		console.log("Current booking details: ", response.data);
 		return response.data;
 	} catch (err) {
 		throw err;

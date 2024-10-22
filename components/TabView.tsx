@@ -10,7 +10,7 @@ import {
 	getHotelEvents,
 	getUpcomingUserBooking,
 	submitRequest,
-    getLocationForHotel
+	getLocationForHotel,
 } from "@/server/requests";
 import axiosInstance from "@/server/axiosInstance";
 import apiInstance from "@/server/axiosInstance";
@@ -44,13 +44,13 @@ const TabView: React.FC<Props> = ({ activeItem }) => {
 	const OngoingTrip = () => {
 		const [currentBooking, setCurrentBooking] = useState(null);
 		const [currentHotel, setCurrentHotel] = useState(null);
-
 		const [expandedEvent, setExpandedEvent] = useState<number | null>(null);
 
 		const fetchCurrentBooking = async () => {
 			try {
 				//const booking = await getCurrnetUserBooking(user.userId);
 				const booking = await getCurrentBookings(user.userId);
+				console.log("Booking data = ", booking.data);
 				setCurrentBooking(booking[0]); // Assuming the booking API returns an array
 			} catch (error) {
 				console.error("Failed to fetch current booking:", error);
@@ -59,23 +59,33 @@ const TabView: React.FC<Props> = ({ activeItem }) => {
 
 		const fetchCurrentHotel = async () => {
 			try {
-				//console.log(currentBooking);
-				const hotel = await getHotelById(currentBooking.hotel_id);
+				// Ensure currentBooking is not null and has a valid hotel_id
+				if (!currentBooking || !currentBooking["hotel_id"]) {
+					console.error("No valid current booking or hotel_id found");
+					return;
+				}
+
+				console.log("Fetching hotel with ID =", currentBooking["hotel_id"]);
+				const hotel = await getHotelById(currentBooking["hotel_id"]);
 				setCurrentHotel(hotel);
 			} catch (error) {
 				console.error("Failed to fetch current hotel:", error);
 			}
 		};
 
+		// Adjusting the useEffect for better handling
 		useEffect(() => {
 			if (user.userId) {
 				fetchCurrentBooking();
-				//fetchCurrentHotel();
 			}
 		}, [user.userId]);
 
+		console.log(currentBooking);
+
 		useEffect(() => {
-			fetchCurrentHotel();
+			if (currentBooking != null) {
+				fetchCurrentHotel();
+			}
 		}, [currentBooking]);
 
 		// Helper function to format the date
@@ -331,7 +341,7 @@ const TabView: React.FC<Props> = ({ activeItem }) => {
 		const [activeTab, setActiveTab] = useState("Details");
 		const [showRecommendations, setShowRecommendations] = useState(false);
 		const [upcomingBookings, setUpcomingBookings] = useState([]);
-        const [locationData, setLocationData] = useState(null);
+		const [locationData, setLocationData] = useState(null);
 
 		// // Fetch upcoming bookings for the user
 		// const fetchUpcomingBooking = async () => {
@@ -340,77 +350,79 @@ const TabView: React.FC<Props> = ({ activeItem }) => {
 		// 	setUpcomingBookings(bookingData); // Assuming the booking API returns an array
 		// };
 
-        // const fetchLocationForHotel = async () => {
-        //     const locationData = await getLocationForHotel(hotelId);
-        //     console.log("location data =", locationData);
-        //     setLocationData(locationData);
-        // }
+		// const fetchLocationForHotel = async () => {
+		//     const locationData = await getLocationForHotel(hotelId);
+		//     console.log("location data =", locationData);
+		//     setLocationData(locationData);
+		// }
 
 		// if (!upcomingBookings) {
 		// 	return null; // Render nothing if either of the data is not available
 		// }
 
 		useEffect(() => {
-            if (user.userId) {
-              const fetchData = async () => {
-                const bookingData = await getUpcomingUserBooking(user.userId);
-                setUpcomingBookings(bookingData);
-                
-                // Fetch location data for each hotel
-                const locationPromises = bookingData.map(booking => 
-                  getLocationForHotel(booking.hotel_id)
-                );
-                const locationResults = await Promise.all(locationPromises);
-                
-                // Combine booking data with location data
-                const combinedData = bookingData.map((booking, index) => ({
-                  ...booking,
-                  location: locationResults[index]
-                }));
-                
-                setUpcomingBookings(combinedData);
-              };
-              
-              fetchData();
-            }
-          }, [user.userId]);
+			if (user.userId) {
+				const fetchData = async () => {
+					const bookingData = await getUpcomingUserBooking(user.userId);
+					setUpcomingBookings(bookingData);
+
+					// Fetch location data for each hotel
+					const locationPromises = bookingData.map((booking) =>
+						getLocationForHotel(booking.hotel_id)
+					);
+					const locationResults = await Promise.all(locationPromises);
+
+					// Combine booking data with location data
+					const combinedData = bookingData.map((booking, index) => ({
+						...booking,
+						location: locationResults[index],
+					}));
+
+					setUpcomingBookings(combinedData);
+				};
+
+				fetchData();
+			}
+		}, [user.userId]);
 
 		// Helper function to format the date
 		const formatDisplayDate = (dateString) => {
-            return format(new Date(dateString), "EEE, MMM d");
-          };
+			return format(new Date(dateString), "EEE, MMM d");
+		};
 
 		// DetailsTab component to show upcoming bookings
 		const DetailsTab = () => (
-            <ScrollView style={styles.scrollView}>
-              <ThemedText style={styles.sectionTitle}>Upcoming Bookings</ThemedText>
-              {upcomingBookings.map((booking, index) => (
-                <View key={index} style={styles.bookingItem}>
-                  <ThemedText style={styles.bookingNumber}>{index + 1}.</ThemedText>
-                  <View style={styles.bookingDetails}>
-                    <View style={styles.row}>
-                      <Ionicons name="business-outline" size={20} color="#666" />
-                      <ThemedText style={styles.hotelName}>
-                        {`${booking.hotel_name}, ${booking.hotel_id}`}
-                      </ThemedText>
-                    </View>
-                    <View style={styles.row}>
-                      <Ionicons name="bed-outline" size={20} color="#666" />
-                      <ThemedText style={styles.roomInfo}>
-                        {`${booking.room_info.beds} Beds, ${booking.room_info.bathrooms} Bathrooms, ${booking.room_info.size} Size Room`}
-                      </ThemedText>
-                    </View>
-                    <View style={styles.row}>
-                      <Ionicons name="calendar-outline" size={20} color="#666" />
-                      <ThemedText style={styles.dateInfo}>
-                        {`${formatDisplayDate(booking.start_date)} to ${formatDisplayDate(booking.end_date)}`}
-                      </ThemedText>
-                    </View>
-                  </View>
-                </View>
-              ))}
-            </ScrollView>
-          );
+			<ScrollView style={styles.scrollView}>
+				<ThemedText style={styles.sectionTitle}>Upcoming Bookings</ThemedText>
+				{upcomingBookings.map((booking, index) => (
+					<View key={index} style={styles.bookingItem}>
+						<ThemedText style={styles.bookingNumber}>{index + 1}.</ThemedText>
+						<View style={styles.bookingDetails}>
+							<View style={styles.row}>
+								<Ionicons name="business-outline" size={20} color="#666" />
+								<ThemedText style={styles.hotelName}>
+									{`${booking.hotel_name}, ${booking.hotel_id}`}
+								</ThemedText>
+							</View>
+							<View style={styles.row}>
+								<Ionicons name="bed-outline" size={20} color="#666" />
+								<ThemedText style={styles.roomInfo}>
+									{`${booking.room_info.beds} Beds, ${booking.room_info.bathrooms} Bathrooms, ${booking.room_info.size} Size Room`}
+								</ThemedText>
+							</View>
+							<View style={styles.row}>
+								<Ionicons name="calendar-outline" size={20} color="#666" />
+								<ThemedText style={styles.dateInfo}>
+									{`${formatDisplayDate(
+										booking.start_date
+									)} to ${formatDisplayDate(booking.end_date)}`}
+								</ThemedText>
+							</View>
+						</View>
+					</View>
+				))}
+			</ScrollView>
+		);
 
 		// GetRecommendationsTab to display trip recommendations
 		const GetRecommendationsTab = () => (
