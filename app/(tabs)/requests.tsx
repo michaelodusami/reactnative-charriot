@@ -26,7 +26,7 @@ interface Request {
 	status: "pending" | "in-progress" | "completed";
 }
 
-const REFRESH_INTERVAL = 30000; // 30 seconds
+const REFRESH_INTERVAL = 3000; // 30 seconds
 
 const RequestsTab: React.FC = () => {
 	const { user } = useUser();
