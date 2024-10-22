@@ -3,10 +3,8 @@ import { ThemedText } from "@/components/ThemedText";
 import { useUser } from "@/providers/UserContext";
 import { useTheme, useFocusEffect } from "@react-navigation/native";
 import React, { useCallback, useState } from "react";
-import { View, TextInput, StyleSheet, FlatList, TouchableOpacity, Alert } from "react-native";
+import { View, TextInput, StyleSheet, FlatList, TouchableOpacity } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { ExpoSpeechRecognitionModule, useSpeechRecognitionEvent } from "expo-speech-recognition";
-import { PeregrineColors } from "@/constants/Colors";
 
 const quickActionsMap: any = {
 	current: [
@@ -72,54 +70,8 @@ const ChatBotScreen = () => {
 	const [messages, setMessages] = useState<Array<{ id: string; text: string; sender: string }>>(
 		[]
 	);
-	const [showOptions, setShowOptions] = useState<boolean>(true);
-	const [isListening, setIsListening] = useState<boolean>(false);
-	const { colors } = useTheme();
-
-	// Speech Recognition Event Handlers
-	useSpeechRecognitionEvent("start", () => setIsListening(true));
-	useSpeechRecognitionEvent("end", () => setIsListening(false));
-	useSpeechRecognitionEvent("result", (event) => {
-		if (event.results[0]?.transcript) {
-			setInputText(event.results[0].transcript);
-			if (event.isFinal) {
-				handleSendMessage(event.results[0].transcript);
-				ExpoSpeechRecognitionModule.stop();
-			}
-		}
-	});
-	useSpeechRecognitionEvent("error", (event) => {
-		console.log("Speech recognition error:", event.error, event.message);
-		Alert.alert("Error", "Failed to recognize speech. Please try again.");
-		setIsListening(false);
-	});
-
-	const startListening = async () => {
-		try {
-			const result = await ExpoSpeechRecognitionModule.requestPermissionsAsync();
-			if (!result.granted) {
-				Alert.alert(
-					"Permission Required",
-					"Microphone permission is required for speech recognition."
-				);
-				return;
-			}
-
-			await ExpoSpeechRecognitionModule.start({
-				lang: "en-US",
-				interimResults: true,
-				maxAlternatives: 1,
-				continuous: false,
-			});
-		} catch (error) {
-			console.error("Error starting speech recognition:", error);
-			Alert.alert("Error", "Failed to start speech recognition. Please try again.");
-		}
-	};
-
-	const stopListening = () => {
-		ExpoSpeechRecognitionModule.stop();
-	};
+	const [showOptions, setShowOptions] = useState<boolean>(true); // Controls visibility of quick actions & booking types
+	const { colors } = useTheme(); // Access theme colors
 
 	const handleTypeChange = (type: string) => {
 		setBookingType(type);
@@ -146,6 +98,7 @@ const ChatBotScreen = () => {
 	};
 
 	const generateFakeResponse = (userText: string) => {
+		// Simulate different responses based on the input message
 		const responses = [
 			"Sure, I can help you with that!",
 			"Let me get that information for you.",
@@ -166,12 +119,11 @@ const ChatBotScreen = () => {
 
 	useFocusEffect(
 		useCallback(() => {
+			// Reset all the states when the screen gains focus
 			setInputText("");
 			setShowOptions(true);
 			setMessages([]);
 			setBookingType("current");
-			setIsListening(false);
-			ExpoSpeechRecognitionModule.abort();
 		}, [])
 	);
 
@@ -283,16 +235,6 @@ const ChatBotScreen = () => {
 					placeholderTextColor={colors.placeholder}
 				/>
 				<TouchableOpacity
-					onPress={() => (isListening ? stopListening() : startListening())}
-					style={styles.iconButton}
-				>
-					<Icon
-						name={isListening ? "microphone" : "microphone-outline"}
-						size={24}
-						color={isListening ? PeregrineColors.yellow : PeregrineColors.blue}
-					/>
-				</TouchableOpacity>
-				<TouchableOpacity
 					onPress={() => handleSendMessage(inputText)}
 					style={styles.iconButton}
 				>
@@ -311,6 +253,7 @@ const styles = StyleSheet.create({
 	header: {
 		marginTop: 16,
 		marginBottom: 24,
+		//paddingHorizontal: 16,
 	},
 	greetingText: {
 		fontSize: 28,
