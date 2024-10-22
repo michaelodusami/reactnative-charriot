@@ -17,7 +17,7 @@ import apiInstance from "@/server/axiosInstance";
 import { useUser } from "@/providers/UserContext"; // Import the useUser hook
 
 import { format } from "date-fns";
-import { getCurrentBookings, getHotelById } from "@/server/server";
+import { getCurrentBookings, getHotelById, getUpcomingBookings, getPastBookings } from "@/server/server";
 
 type Props = {
 	activeItem: ImageSliderType;
@@ -50,7 +50,6 @@ const TabView: React.FC<Props> = ({ activeItem }) => {
 			try {
 				//const booking = await getCurrnetUserBooking(user.userId);
 				const booking = await getCurrentBookings(user.userId);
-				console.log("Booking data = ", booking.data);
 				setCurrentBooking(booking[0]); // Assuming the booking API returns an array
 			} catch (error) {
 				console.error("Failed to fetch current booking:", error);
@@ -65,7 +64,6 @@ const TabView: React.FC<Props> = ({ activeItem }) => {
 					return;
 				}
 
-				console.log("Fetching hotel with ID =", currentBooking["hotel_id"]);
 				const hotel = await getHotelById(currentBooking["hotel_id"]);
 				setCurrentHotel(hotel);
 			} catch (error) {
@@ -79,8 +77,6 @@ const TabView: React.FC<Props> = ({ activeItem }) => {
 				fetchCurrentBooking();
 			}
 		}, [user.userId]);
-
-		console.log(currentBooking);
 
 		useEffect(() => {
 			if (currentBooking != null) {
@@ -182,7 +178,7 @@ const TabView: React.FC<Props> = ({ activeItem }) => {
 					],
 				},
 				{
-					category: "Concierge",
+					category: "Reception",
 					items: [
 						{ id: "7", name: "Restaurant", icon: "restaurant-outline" },
 						{ id: "8", name: "Taxi Booking", icon: "car-outline" },
@@ -195,12 +191,10 @@ const TabView: React.FC<Props> = ({ activeItem }) => {
 				try {
 					const requestData = {
 						user_id: user.userId,
-						hotel_id: "courtyard", // Replace with the actual hotel ID
+						hotel_id: currentBooking["hotel_id"], // Replace with the actual hotel ID
 						department: category, // Update this with the relevant department
 						task: requestName, // The task name from the clicked item
 					};
-
-					console.log("Request data = ", requestData);
 
 					const response = await apiInstance.post(
 						"https://p5vfoq23g5ps45rtvky2xydcxe0sbwph.lambda-url.us-east-1.on.aws/api/requests/requests",
@@ -213,7 +207,6 @@ const TabView: React.FC<Props> = ({ activeItem }) => {
 						}
 					);
 
-					console.log("Response = ", response.data);
 
 					if (response.status === 200 || response.status === 201) {
 						Alert.alert("Success", `Your ${requestName} request has been submitted.`);
@@ -341,86 +334,116 @@ const TabView: React.FC<Props> = ({ activeItem }) => {
 		const [activeTab, setActiveTab] = useState("Details");
 		const [showRecommendations, setShowRecommendations] = useState(false);
 		const [upcomingBookings, setUpcomingBookings] = useState([]);
-		const [locationData, setLocationData] = useState(null);
+		const [upcomingHotels, setUpcomingHotels] = useState({});
 
-		// // Fetch upcoming bookings for the user
-		// const fetchUpcomingBooking = async () => {
-		// 	const bookingData = await getUpcomingUserBooking(user.userId);
-		// 	console.log("Booking data =", bookingData);
-		// 	setUpcomingBookings(bookingData); // Assuming the booking API returns an array
-		// };
+		const fetchUpcomingBookings = async () => {
+			try {
+				//const booking = await getCurrnetUserBooking(user.userId);
+				const booking = await getUpcomingBookings(user.userId);
+				console.log("Upcoming booking data = ", booking);
+				setUpcomingBookings(booking); // Assuming the booking API returns an array
+			} catch (error) {
+				console.error("Failed to fetch upcoming bookings:", error);
+			}
+		};
 
-		// const fetchLocationForHotel = async () => {
-		//     const locationData = await getLocationForHotel(hotelId);
-		//     console.log("location data =", locationData);
-		//     setLocationData(locationData);
-		// }
+		const fetchUpcomingHotels = async () => {
+			try {
+				if (!upcomingBookings || !Array.isArray(upcomingBookings)) {
+					console.error("No valid upcoming bookings found");
+					return;
+				}
 
-		// if (!upcomingBookings) {
-		// 	return null; // Render nothing if either of the data is not available
-		// }
+				const hotelsMap = {};  // Create an object to store hotel data
+
+				// Use Promise.all to fetch all hotels in parallel
+				await Promise.all(
+					upcomingBookings.map(async (booking) => {
+						if (!booking["hotel_id"]) {
+							console.warn(`Booking missing hotel_id:`, booking);
+							return;
+						}
+
+						try {
+							const hotel = await getHotelById(booking["hotel_id"]);
+							hotelsMap[booking["hotel_id"]] = hotel;
+						} catch (error) {
+							console.error(`Failed to fetch hotel for ID ${booking["hotel_id"]}:`, error);
+						}
+					})
+				);
+
+				setUpcomingHotels(hotelsMap);
+			} catch (error) {
+				console.error("Failed to fetch hotels:", error);
+			}
+		};
+
+		// Update useEffect dependencies
+		useEffect(() => {
+			if (user?.userId) {
+				fetchUpcomingBookings();
+			}
+		}, [user?.userId]);
 
 		useEffect(() => {
-			if (user.userId) {
-				const fetchData = async () => {
-					const bookingData = await getUpcomingUserBooking(user.userId);
-					setUpcomingBookings(bookingData);
-
-					// Fetch location data for each hotel
-					const locationPromises = bookingData.map((booking) =>
-						getLocationForHotel(booking.hotel_id)
-					);
-					const locationResults = await Promise.all(locationPromises);
-
-					// Combine booking data with location data
-					const combinedData = bookingData.map((booking, index) => ({
-						...booking,
-						location: locationResults[index],
-					}));
-
-					setUpcomingBookings(combinedData);
-				};
-
-				fetchData();
+			if (upcomingBookings.length > 0) {
+				fetchUpcomingHotels();
 			}
-		}, [user.userId]);
+		}, [upcomingBookings]);
 
 		// Helper function to format the date
 		const formatDisplayDate = (dateString) => {
 			return format(new Date(dateString), "EEE, MMM d");
 		};
 
-		// DetailsTab component to show upcoming bookings
+		// Updated DetailsTab to use both bookings and hotels data
 		const DetailsTab = () => (
 			<ScrollView style={styles.scrollView}>
 				<ThemedText style={styles.sectionTitle}>Upcoming Bookings</ThemedText>
-				{upcomingBookings.map((booking, index) => (
-					<View key={index} style={styles.bookingItem}>
-						<ThemedText style={styles.bookingNumber}>{index + 1}.</ThemedText>
-						<View style={styles.bookingDetails}>
-							<View style={styles.row}>
-								<Ionicons name="business-outline" size={20} color="#666" />
-								<ThemedText style={styles.hotelName}>
-									{`${booking.hotel_name}, ${booking.hotel_id}`}
-								</ThemedText>
-							</View>
-							<View style={styles.row}>
-								<Ionicons name="bed-outline" size={20} color="#666" />
-								<ThemedText style={styles.roomInfo}>
-									{`${booking.room_info.beds} Beds, ${booking.room_info.bathrooms} Bathrooms, ${booking.room_info.size} Size Room`}
-								</ThemedText>
-							</View>
-							<View style={styles.row}>
-								<Ionicons name="calendar-outline" size={20} color="#666" />
-								<ThemedText style={styles.dateInfo}>
-									{`${formatDisplayDate(
-										booking.start_date
-									)} to ${formatDisplayDate(booking.end_date)}`}
-								</ThemedText>
+				{upcomingBookings.map((booking, index) => {
+					const hotel = upcomingHotels[booking.hotel_id];
+					console.log("Hotel = ", hotel);
+					return (
+						<View key={booking.id || index} style={styles.bookingItem}>
+							<ThemedText style={styles.bookingNumber}>{index + 1}.</ThemedText>
+							<View style={styles.bookingDetails}>
+								<View style={styles.row}>
+									<Ionicons name="business-outline" size={20} color="#666" />
+									<ThemedText style={styles.hotelName}>
+										{hotel ? `${hotel.name}${hotel.location?.city ? `, ${hotel.location.city}` : ''}` : 'Loading...'}
+									</ThemedText>
+								</View>
+								<View style={styles.row}>
+									<Ionicons name="bed-outline" size={20} color="#666" />
+									<ThemedText style={styles.roomInfo}>
+										{booking.room_info ?
+											`${booking.room_info.beds} Beds, ${booking.room_info.bathrooms} Bathrooms, ${booking.room_info.size} Size Room`
+											: 'Room information not available'
+										}
+									</ThemedText>
+								</View>
+								<View style={styles.row}>
+									<Ionicons name="calendar-outline" size={20} color="#666" />
+									<ThemedText style={styles.dateInfo}>
+										{booking.start_date && booking.end_date ?
+											`${formatDisplayDate(booking.start_date)} to ${formatDisplayDate(booking.end_date)}`
+											: 'Dates not available'
+										}
+									</ThemedText>
+								</View>
+								{booking && (
+									<View style={styles.row}>
+										<Ionicons name="key-outline" size={20} color="#666" />
+										<ThemedText style={styles.locationInfo}>
+											Room {booking.room_number || 'Room number not available'}
+										</ThemedText>
+									</View>
+								)}
 							</View>
 						</View>
-					</View>
-				))}
+					);
+				})}
 			</ScrollView>
 		);
 
@@ -502,63 +525,116 @@ const TabView: React.FC<Props> = ({ activeItem }) => {
 	};
 
 	const PastTrip = () => {
+		const { user } = useUser();
 		const [activeTab, setActiveTab] = useState("Details");
+		const [showRecommendations, setShowRecommendations] = useState(false);
+		const [pastBookings, setPastBookings] = useState([]);
+		const [pastHotels, setPastHotels] = useState({});
+
+		const fetchPastBookings = async () => {
+			try {
+				const booking = await getPastBookings(user.userId);
+				console.log("Past booking data = ", booking);
+				setPastBookings(booking);
+			} catch (error) {
+				console.error("Failed to fetch past bookings:", error);
+			}
+		};
+
+		const fetchPastHotels = async () => {
+			try {
+				if (!pastBookings || !Array.isArray(pastBookings)) {
+					console.error("No valid past bookings found");
+					return;
+				}
+
+				const hotelsMap = {};
+
+				await Promise.all(
+					pastBookings.map(async (booking) => {
+						if (!booking["hotel_id"]) {
+							console.warn(`Booking missing hotel_id:`, booking);
+							return;
+						}
+
+						try {
+							const hotel = await getHotelById(booking["hotel_id"]);
+							hotelsMap[booking["hotel_id"]] = hotel;
+						} catch (error) {
+							console.error(`Failed to fetch hotel for ID ${booking["hotel_id"]}:`, error);
+						}
+					})
+				);
+
+				setPastHotels(hotelsMap);
+			} catch (error) {
+				console.error("Failed to fetch hotels:", error);
+			}
+		};
+
+		useEffect(() => {
+			if (user?.userId) {
+				fetchPastBookings();
+			}
+		}, [user?.userId]);
+
+		useEffect(() => {
+			if (pastBookings.length > 0) {
+				fetchPastHotels();
+			}
+		}, [pastBookings]);
+
+		// Helper function to format the date
+		const formatDisplayDate = (dateString) => {
+			return format(new Date(dateString), "EEE, MMM d");
+		};
 
 		const DetailsTab = () => (
 			<ScrollView style={styles.scrollView}>
 				<ThemedText style={styles.sectionTitle}>Past Bookings</ThemedText>
-				{[
-					{
-						hotel: "Mountain Lodge",
-						city: "Aspen",
-						rooms: "1 Chalet Suite",
-						checkIn: "Tue, Dec 5",
-						checkOut: "Sun, Dec 10",
-					},
-					{
-						hotel: "Beach Resort",
-						city: "Cancun",
-						rooms: "2 Ocean View Rooms",
-						checkIn: "Fri, Mar 15",
-						checkOut: "Wed, Mar 20",
-					},
-					{
-						hotel: "City Center Hotel",
-						city: "London",
-						rooms: "1 Executive Suite",
-						checkIn: "Mon, Jun 7",
-						checkOut: "Sat, Jun 12",
-					},
-					{
-						hotel: "Historic Inn",
-						city: "Boston",
-						rooms: "1 Classic Room",
-						checkIn: "Thu, Aug 18",
-						checkOut: "Sun, Aug 21",
-					},
-				].map((booking, index) => (
-					<View key={index} style={styles.bookingItem}>
-						<ThemedText style={styles.bookingNumber}>{index + 1}.</ThemedText>
-						<View style={styles.bookingDetails}>
-							<View style={styles.row}>
-								<Ionicons name="business-outline" size={20} color="#666" />
-								<ThemedText
-									style={styles.hotelName}
-								>{`${booking.hotel}, ${booking.city}`}</ThemedText>
-							</View>
-							<View style={styles.row}>
-								<Ionicons name="bed-outline" size={20} color="#666" />
-								<ThemedText style={styles.roomInfo}>{booking.rooms}</ThemedText>
-							</View>
-							<View style={styles.row}>
-								<Ionicons name="calendar-outline" size={20} color="#666" />
-								<ThemedText
-									style={styles.dateInfo}
-								>{`${booking.checkIn} to ${booking.checkOut}`}</ThemedText>
+				{pastBookings.map((booking, index) => {
+					const hotel = pastHotels[booking.hotel_id];
+					console.log("Hotel = ", hotel);
+					return (
+						<View key={booking.id || index} style={styles.bookingItem}>
+							<ThemedText style={styles.bookingNumber}>{index + 1}.</ThemedText>
+							<View style={styles.bookingDetails}>
+								<View style={styles.row}>
+									<Ionicons name="business-outline" size={20} color="#666" />
+									<ThemedText style={styles.hotelName}>
+										{hotel ? `${hotel.name}${hotel.location?.city ? `, ${hotel.location.city}` : ''}` : 'Loading...'}
+									</ThemedText>
+								</View>
+								<View style={styles.row}>
+									<Ionicons name="bed-outline" size={20} color="#666" />
+									<ThemedText style={styles.roomInfo}>
+										{booking.room_info ?
+											`${booking.room_info.beds} Beds, ${booking.room_info.bathrooms} Bathrooms, ${booking.room_info.size} Size Room`
+											: 'Room information not available'
+										}
+									</ThemedText>
+								</View>
+								<View style={styles.row}>
+									<Ionicons name="calendar-outline" size={20} color="#666" />
+									<ThemedText style={styles.dateInfo}>
+										{booking.start_date && booking.end_date ?
+											`${formatDisplayDate(booking.start_date)} to ${formatDisplayDate(booking.end_date)}`
+											: 'Dates not available'
+										}
+									</ThemedText>
+								</View>
+								{booking && (
+									<View style={styles.row}>
+										<Ionicons name="key-outline" size={20} color="#666" />
+										<ThemedText style={styles.locationInfo}>
+											Room {booking.room_number || 'Room number not available'}
+										</ThemedText>
+									</View>
+								)}
 							</View>
 						</View>
-					</View>
-				))}
+					);
+				})}
 			</ScrollView>
 		);
 
@@ -843,6 +919,9 @@ const styles = StyleSheet.create({
 		fontFamily: "EffaFamily",
 		fontSize: 16,
 		marginLeft: 10,
+	},
+	locationInfo: {
+		marginHorizontal: 10,
 	},
 	dateInfo: {
 		fontFamily: "EffaFamily",

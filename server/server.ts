@@ -240,13 +240,25 @@ export const deleteBooking = async (booking_id: string) => {
 export const getCurrentBookings = async (user_id: string) => {
 	try {
 		const response = await apiInstance.get(`/api/bookings/bookings/current/${user_id}`);
-		console.log("Current booking details: ", response.data);
 		return response.data;
 	} catch (err) {
 		throw err;
 	}
 };
 
+/**
+ * Get upcoming bookings for a user.
+ * @param user_id - The ID of the user.
+ * @returns The current bookings data.
+ */
+export const getUpcomingBookings = async (user_id: string) => {
+	try {
+		const response = await apiInstance.get(`/api/bookings/bookings/future/${user_id}`);
+		return response.data;
+	} catch (err) {
+		throw err;
+	}
+};
 /**
  * Get past bookings for a user.
  * @param user_id - The ID of the user.
@@ -310,7 +322,6 @@ export const createHotel = async (hotelData: object) => {
 export const getHotelById = async (hotel_id: string) => {
 	try {
 		const response = await apiInstance.get(`/api/hotels/hotels/${hotel_id}`);
-		console.log(response.data);
 		return response.data;
 	} catch (err) {
 		throw err;
