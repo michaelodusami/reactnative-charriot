@@ -1,0 +1,12 @@
+Dietary Restrictions: 
+    MainChoice: 
+        - vegan, vegetarian, none
+    Other:
+        - (other: string input);
+Bedding: string
+Climate: string
+Energy: Number
+Room View: String | 
+Quiet Room: Boolean
+Num Pillows: Integer
+Mattress Type: 
