@@ -1,10 +1,17 @@
+import React, { useCallback, useState, useEffect, useRef } from "react";
+import { View, TextInput, StyleSheet, FlatList, TouchableOpacity } from "react-native";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import SafeArea from "@/components/SafeArea";
 import { ThemedText } from "@/components/ThemedText";
 import { useUser } from "@/providers/UserContext";
-import { useTheme, useFocusEffect } from "@react-navigation/native";
-import React, { useCallback, useState } from "react";
-import { View, TextInput, StyleSheet, FlatList, TouchableOpacity } from "react-native";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { useTheme } from "@react-navigation/native";
+import {
+	getCurrentBookings,
+	getUpcomingBookings,
+	getPastBookings,
+	sendChatMessage,
+	getUserInteractions,
+} from "@/server/server";
 
 const quickActionsMap: any = {
 	current: [
@@ -70,62 +77,150 @@ const ChatBotScreen = () => {
 	const [messages, setMessages] = useState<Array<{ id: string; text: string; sender: string }>>(
 		[]
 	);
-	const [showOptions, setShowOptions] = useState<boolean>(true); // Controls visibility of quick actions & booking types
-	const { colors } = useTheme(); // Access theme colors
+	const [showOptions, setShowOptions] = useState<boolean>(true); // Controls visibility of quick actions
+	const { colors } = useTheme();
+	const flatListRef = useRef<FlatList>(null); // Reference to the FlatList for scrolling
 
+	// Scroll to the bottom of the list whenever new messages are added
+	const scrollToBottom = () => {
+		if (flatListRef.current) {
+			flatListRef.current.scrollToEnd({ animated: true });
+		}
+	};
+
+	// Fetch previous chat when screen is opened or revisited
+	useEffect(() => {
+		const loadPreviousChats = async () => {
+			try {
+				const previousChats = await getUserInteractions(user.userId, bookingType);
+				const formattedMessages = previousChats.reduce((acc, chat) => {
+					if (chat.user_query) {
+						acc.push({
+							id: `${chat.interaction_id}-user`,
+							text: chat.user_query,
+							sender: "user",
+						});
+					}
+					if (chat.response_content) {
+						acc.push({
+							id: `${chat.interaction_id}-bot`,
+							text: chat.response_content,
+							sender: "bot",
+						});
+					}
+					return acc;
+				}, []);
+
+				setMessages(formattedMessages);
+
+				// Hide quick actions if there are previous chats
+				if (formattedMessages.length > 0) {
+					setShowOptions(false);
+				}
+
+				// Scroll to bottom after loading previous chats
+				scrollToBottom();
+			} catch (error) {
+				console.error("Error fetching previous chats:", error);
+			}
+		};
+
+		loadPreviousChats();
+	}, [bookingType, user.userId]);
+
+	// Handle booking type change
 	const handleTypeChange = (type: string) => {
 		setBookingType(type);
+		setMessages([]); // Clear previous messages when booking type is changed
+		setShowOptions(true); // Show quick actions after booking type change
 	};
 
-	const getQuickActions = () => {
-		return quickActionsMap[bookingType] || [];
+	// Back to default chat page (reset to quick actions)
+	const handleBackToDefault = () => {
+		setMessages([]); // Clear messages
+		setShowOptions(true); // Show quick actions
+		setInputText(""); // Clear input text
 	};
 
-	const handleSendMessage = (message: string) => {
+	// Get booking ID based on the booking type
+	const fetchBookingId = async () => {
+		let bookingData;
+		try {
+			if (bookingType === "current") {
+				bookingData = await getCurrentBookings(user.userId);
+			} else if (bookingType === "upcoming") {
+				bookingData = await getUpcomingBookings(user.userId);
+			} else if (bookingType === "past") {
+				bookingData = await getPastBookings(user.userId);
+			}
+			return bookingData?.[0]?.booking_id || null; // Return the first booking's ID
+		} catch (error) {
+			console.error("Error fetching booking:", error);
+			return null;
+		}
+	};
+
+	// Send a new message
+	const handleSendMessage = async (message: string) => {
 		if (message.trim() === "") return;
 
-		const userMessage = {
-			id: (messages.length + 1).toString(),
-			text: message,
-			sender: "user",
-		};
-
-		const fakeResponse = generateFakeResponse(message);
-
-		setMessages((prevMessages) => [...prevMessages, userMessage, fakeResponse]);
+		const userMessage = { id: (messages.length + 1).toString(), text: message, sender: "user" };
+		setMessages((prevMessages) => [...prevMessages, userMessage]);
 		setInputText("");
 		setShowOptions(false);
+
+		try {
+			const bookingId = await fetchBookingId();
+			if (bookingId) {
+				const response = await sendChatMessage({
+					user_id: user.userId,
+					booking_id: bookingId,
+					question: message,
+					booking_type: bookingType,
+				});
+
+				if (response && response.response_content) {
+					const botMessage = {
+						id: (messages.length + 2).toString(),
+						text: response.response_content || "Sorry, I couldn't process that.",
+						sender: "bot",
+					};
+					setMessages((prevMessages) => [...prevMessages, botMessage]);
+				} else {
+					setMessages((prevMessages) => [
+						...prevMessages,
+						{
+							id: (messages.length + 2).toString(),
+							text: "Unexpected response structure.",
+							sender: "bot",
+						},
+					]);
+				}
+			} else {
+				setMessages((prevMessages) => [
+					...prevMessages,
+					{
+						id: (messages.length + 2).toString(),
+						text: "No booking data found.",
+						sender: "bot",
+					},
+				]);
+			}
+		} catch (error) {
+			console.error("Error sending chat message:", error);
+			setMessages((prevMessages) => [
+				...prevMessages,
+				{
+					id: (messages.length + 2).toString(),
+					text: "Error processing your request.",
+					sender: "bot",
+				},
+			]);
+		}
+
+		// Scroll to the bottom after sending a message
+		scrollToBottom();
 	};
-
-	const generateFakeResponse = (userText: string) => {
-		// Simulate different responses based on the input message
-		const responses = [
-			"Sure, I can help you with that!",
-			"Let me get that information for you.",
-			"I'll notify the hotel staff immediately.",
-			"Can you provide more details about your request?",
-		];
-
-		const responseText =
-			responses[Math.floor(Math.random() * responses.length)] ||
-			"I'm not sure, let me check.";
-
-		return {
-			id: (messages.length + 2).toString(),
-			text: responseText,
-			sender: "bot",
-		};
-	};
-
-	useFocusEffect(
-		useCallback(() => {
-			// Reset all the states when the screen gains focus
-			setInputText("");
-			setShowOptions(true);
-			setMessages([]);
-			setBookingType("current");
-		}, [])
-	);
 
 	const renderQuickAction = ({ item }: any) => (
 		<TouchableOpacity onPress={() => handleSendMessage(item.title)} style={styles.actionCard}>
@@ -160,12 +255,24 @@ const ChatBotScreen = () => {
 
 	return (
 		<SafeArea style={styles.container}>
+			<TouchableOpacity onPress={handleBackToDefault}>
+				<Icon name="arrow-left" size={24} color={colors.primary} />
+			</TouchableOpacity>
 			<View style={styles.header}>
 				<ThemedText style={styles.greetingText}>
 					Hey, {user.userId.substring(0, user.userId.indexOf("@")).toUpperCase()}
 				</ThemedText>
-				<ThemedText style={styles.subHeadingText}>How I can help you?</ThemedText>
+				<ThemedText style={styles.subHeadingText}>How can I help you today?</ThemedText>
 			</View>
+
+			<FlatList
+				ref={flatListRef}
+				data={messages}
+				renderItem={renderMessage}
+				keyExtractor={(item) => item.id}
+				contentContainerStyle={styles.messageList}
+				onContentSizeChange={scrollToBottom} // Automatically scroll to bottom when content changes
+			/>
 
 			{showOptions && (
 				<>
@@ -205,20 +312,13 @@ const ChatBotScreen = () => {
 					</View>
 
 					<FlatList
-						data={getQuickActions()}
+						data={quickActionsMap[bookingType] || []}
 						renderItem={renderQuickAction}
 						keyExtractor={(item) => item.id}
 						contentContainerStyle={styles.actionList}
 					/>
 				</>
 			)}
-
-			<FlatList
-				data={messages}
-				renderItem={renderMessage}
-				keyExtractor={(item) => item.id}
-				contentContainerStyle={styles.messageList}
-			/>
 
 			<View style={styles.inputContainer}>
 				<TextInput
@@ -227,10 +327,7 @@ const ChatBotScreen = () => {
 						{ backgroundColor: colors.background, color: colors.text },
 					]}
 					value={inputText}
-					onChangeText={(text) => {
-						setInputText(text);
-						if (text.trim() !== "") setShowOptions(false);
-					}}
+					onChangeText={(text) => setInputText(text)}
 					placeholder="Tell us about your request..."
 					placeholderTextColor={colors.placeholder}
 				/>
@@ -251,14 +348,15 @@ const styles = StyleSheet.create({
 		paddingVertical: 24,
 	},
 	header: {
-		marginTop: 16,
-		marginBottom: 24,
-		//paddingHorizontal: 16,
+		// flexDirection: "row",
+		alignItems: "center",
+		// marginBottom: 24,
 	},
 	greetingText: {
 		fontSize: 28,
 		fontWeight: "bold",
 		lineHeight: 30,
+		marginLeft: 10,
 	},
 	subHeadingText: {
 		fontSize: 22,
@@ -306,11 +404,6 @@ const styles = StyleSheet.create({
 		shadowOpacity: 0.1,
 		shadowRadius: 4,
 		elevation: 3,
-	},
-	sectionTitle: {
-		marginBottom: 16,
-		fontSize: 16,
-		fontWeight: "500",
 	},
 	iconContainer: {
 		width: 40,

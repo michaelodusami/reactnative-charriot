@@ -278,14 +278,14 @@ export const getPastBookings = async (user_id: string) => {
  * @param user_id - The ID of the user.
  * @returns The future bookings data.
  */
-export const getFutureBookings = async (user_id: string) => {
-	try {
-		const response = await apiInstance.get(`/api/bookings/bookings/future/${user_id}`);
-		return response.data;
-	} catch (err) {
-		throw err;
-	}
-};
+// export const getFutureBookings = async (user_id: string) => {
+// 	try {
+// 		const response = await apiInstance.get(`/api/bookings/bookings/future/${user_id}`);
+// 		return response.data;
+// 	} catch (err) {
+// 		throw err;
+// 	}
+// };
 
 /**
  * Get all hotels.
@@ -354,5 +354,109 @@ export const deleteHotel = async (hotel_id: string) => {
 		return response.data;
 	} catch (err) {
 		throw err;
+	}
+};
+
+/**
+ * Fetches user interactions based on user ID, booking ID, and booking type.
+ *
+ * @param userId - The ID of the user to retrieve interactions for (required).
+ * @param bookingId - The ID of the booking (optional).
+ * @param bookingType - The type of the booking such as "past", "current", or "upcoming" (optional).
+ *
+ * @returns A promise that resolves to an array of user interactions, or rejects with an error.
+ *
+ * @example
+ * ```
+ * fetchUserInteractions("user123", "booking456", "past", 0, 50)
+ *  .then(interactions => console.log(interactions))
+ *  .catch(error => console.error(error));
+ * ```
+ */
+export const fetchUserInteractions = async (
+	userId: string,
+	bookingId?: string,
+	bookingType?: string
+) => {
+	console.log(userId, bookingId, bookingType);
+	try {
+		const response = await apiInstance.get(`/api/rag/interactions/user/${userId}`, {
+			params: {
+				booking_id: bookingId,
+				booking_type: bookingType,
+			},
+			headers: {
+				Accept: "application/json",
+			},
+		});
+		return response.data;
+	} catch (error) {
+		throw new Error(`Error fetching user interactions: ${error}`);
+	}
+};
+
+/**
+ * Sends a chat message to the /api/rag/interactions/chat endpoint.
+ *
+ * @param params - Object containing user_id, booking_id, question, and booking_type.
+ * @returns The response from the API, containing the chatbot's reply.
+ */
+export const sendChatMessage = async (params: {
+	user_id: string;
+	booking_id: string;
+	question: string;
+	booking_type: string;
+}) => {
+	try {
+		const response = await apiInstance.post("/api/rag/interactions/chat", params, {
+			headers: {
+				Accept: "application/json",
+				"Content-Type": "application/json",
+			},
+		});
+
+		// Check if response data exists and return the correct structure
+		if (response && response.data && response.data.response_content) {
+			return response.data; // Return the expected response object
+		} else {
+			throw new Error("Invalid response structure");
+		}
+	} catch (error) {
+		console.error("Error sending chat message:", error);
+		throw error;
+	}
+};
+
+/**
+ * Fetches previous user interactions (chat history) from the /api/rag/interactions/user/{user_id} endpoint.
+ *
+ * @param user_id - The ID of the user.
+ * @param booking_type - The type of the booking (current, past, upcoming).
+ * @param booking_id - Optional booking ID to filter interactions.
+ * @param skip - Number of interactions to skip (default is 0).
+ * @param limit - Limit the number of interactions (default is 50).
+ *
+ * @returns The previous chat interactions from the API.
+ */
+export const getUserInteractions = async (
+	user_id: string,
+	booking_type: string,
+	booking_id?: string
+) => {
+	try {
+		const response = await apiInstance.get(`/api/rag/interactions/user/${user_id}`, {
+			params: {
+				booking_type,
+				booking_id,
+			},
+			headers: {
+				Accept: "application/json",
+			},
+		});
+		console.log(response.data);
+		return response.data; // Return the chat interactions from the API
+	} catch (error) {
+		console.error("Error fetching user interactions:", error);
+		throw error;
 	}
 };

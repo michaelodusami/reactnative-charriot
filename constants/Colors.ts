@@ -8,7 +8,7 @@ const tintColorDark = "#fff";
 
 export const PeregrineColors = {
 	blue: "rgb(45,57,87)",
-	yellow: "rbg(209,177,116)",
+	yellow: "rgb(209,177,116)",
 	white: "#fff",
 };
 
