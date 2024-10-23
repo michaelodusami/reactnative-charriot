@@ -16,6 +16,7 @@ import SettingsSection from "@/components/SettingsScreen";
 import { useUser } from "@/providers/UserContext";
 import { capitalizeAndGetUsername } from "@/functions/userFunctions";
 import { Redirect } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 // Section Components
 
 // const PersonalInfoSection = () => (
@@ -54,21 +55,58 @@ const Profile = () => {
 		return <Redirect href={"/(auth)/welcome"} />;
 	}
 
+	const getLoyaltyIconColor = (loyaltyProgram) => {
+		switch (loyaltyProgram) {
+			case "gold":
+				return "#B7791F";
+			case "silver":
+				return "#4A5568";
+			case "bronze":
+				return "#9C4221";
+			default:
+				return "#4A5568";
+		}
+	};
+
 	return (
 		<SafeArea style={styles.container}>
 			{/* Profile Header */}
 			<View style={styles.headerContainer}>
-				{/* <TouchableOpacity onPress={() => alert("Edit Profile Pressed")}>
-					<ThemedText style={styles.editText}>EDIT PROFILE</ThemedText>
-				</TouchableOpacity> */}
 				<Image
-					source={require("../../assets/images/icon.png")}
+					source={require("../../assets/images/pereginebrand.webp")}
 					style={styles.profileImage}
 				/>
 				<ThemedText style={styles.userName}>
 					{capitalizeAndGetUsername(user.userId)}
 				</ThemedText>
 				<ThemedText style={styles.email}>{user.userId}</ThemedText>
+
+				{/* Loyalty Badge */}
+				<View
+					style={[
+						styles.loyaltyBadge,
+						user.loyalty_program === "gold" && styles.goldBadge,
+						user.loyalty_program === "silver" && styles.silverBadge,
+						user.loyalty_program === "bronze" && styles.bronzeBadge,
+					]}
+				>
+					<Ionicons
+						name="diamond-outline"
+						size={16}
+						color={getLoyaltyIconColor(user.loyalty_program)}
+						style={styles.loyaltyIcon}
+					/>
+					<ThemedText
+						style={[
+							styles.loyaltyText,
+							user.loyalty_program === "gold" && styles.goldText,
+							user.loyalty_program === "silver" && styles.silverText,
+							user.loyalty_program === "bronze" && styles.bronzeText,
+						]}
+					>
+						{user.loyalty_program?.toUpperCase()} MEMBER
+					</ThemedText>
+				</View>
 			</View>
 
 			{/* Top Tab Navigation */}
@@ -133,6 +171,54 @@ const styles = StyleSheet.create({
 		// fontFamily: "EffraFamily",
 		// fontSize: 16,
 	},
+	loyaltyBadge: {
+		flexDirection: "row",
+		alignItems: "center",
+		paddingHorizontal: 12,
+		paddingVertical: 6,
+		borderRadius: 20,
+		marginTop: 8,
+		shadowColor: "#000",
+		shadowOffset: {
+			width: 0,
+			height: 2,
+		},
+		shadowOpacity: 0.1,
+		shadowRadius: 3,
+		elevation: 3,
+	},
+	goldBadge: {
+		backgroundColor: "#FEF3C7",
+		borderColor: "#D97706",
+		borderWidth: 1,
+	},
+	silverBadge: {
+		backgroundColor: "#F1F5F9",
+		borderColor: "#64748B",
+		borderWidth: 1,
+	},
+	bronzeBadge: {
+		backgroundColor: "#FDE7DD",
+		borderColor: "#9C4221",
+		borderWidth: 1,
+	},
+	loyaltyIcon: {
+		marginRight: 8,
+	},
+	loyaltyText: {
+		fontWeight: "600",
+		fontSize: 14,
+		letterSpacing: 0.5,
+	},
+	goldText: {
+		color: "#92400E",
+	},
+	silverText: {
+		color: "#1E293B",
+	},
+	bronzeText: {
+		color: "#7C2D12",
+	},
 	tabContainer: {
 		flexDirection: "row",
 		justifyContent: "space-around",
@@ -140,7 +226,7 @@ const styles = StyleSheet.create({
 		// backgroundColor: "#fff",
 	},
 	tabButton: {
-		paddingVertical: 10,
+		paddingVertical: -10,
 		paddingHorizontal: 15,
 	},
 	activeTabButton: {
