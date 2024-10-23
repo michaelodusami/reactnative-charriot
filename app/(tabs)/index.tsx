@@ -16,7 +16,7 @@ const HomePage = () => {
 	return (
 		<SafeArea style={styles.container}>
 			<View>
-				<ThemedText style={styles.subheading}>Make new memories</ThemedText>
+				<ThemedText style={styles.subheading}>Your Journey Awaits</ThemedText>
 			</View>
 			<SafeAreaView style={styles.carouselContainer}>
 				<Slider itemList={ImageSlider} onActiveItemChange={handleActiveItemChange} />
@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
 		marginBottom: -60,
 		marginTop: 20,
 		textAlign: "center",
-		// fontFamily: "Poppins",
-		// fontSize: 32,
+		fontFamily: "Poppins",
+		fontSize: 26,
 	},
 });

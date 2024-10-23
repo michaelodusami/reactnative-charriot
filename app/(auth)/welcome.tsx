@@ -81,7 +81,7 @@ const Onboarding = () => {
 							},
 						]}
 					>
-						Charriot
+						Chariott
 					</Animated.Text>
 
 					<Animated.Text
@@ -112,7 +112,7 @@ const Onboarding = () => {
 							},
 						]}
 					>
-						by peregrine
+						by Peregrine
 					</Animated.Text>
 				</View>
 

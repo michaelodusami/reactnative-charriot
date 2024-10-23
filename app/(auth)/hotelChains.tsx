@@ -116,7 +116,7 @@ const HotelChains = () => {
           },
         ]}
       >
-        <Text style={styles.header}>Welcome to Charriot</Text>
+        <Text style={styles.header}>Welcome to Chariott</Text>
         <Text style={styles.subheader}>Select Your Hotel Partner</Text>
       </Animated.View>
 
