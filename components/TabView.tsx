@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { View, TouchableOpacity, StyleSheet, ScrollView, Image, Alert } from "react-native";
+import {
+	View,
+	TouchableOpacity,
+	StyleSheet,
+	ScrollView,
+	Image,
+	Alert,
+	ActivityIndicator,
+} from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import { ImageSliderType } from "@/data/CarouselData";
 import { Ionicons } from "@expo/vector-icons";
@@ -345,6 +353,7 @@ const TabView: React.FC<Props> = ({ activeItem }) => {
 		const [travelSummary, setTravelSummary] = useState<TravelSummary | null>(null);
 		const [upcomingBookings, setUpcomingBookings] = useState([]);
 		const [upcomingHotels, setUpcomingHotels] = useState({});
+		const [isLoading, setIsLoading] = useState(false); // Add loading state
 
 		const fetchUpcomingBookings = async () => {
 			try {
@@ -392,6 +401,7 @@ const TabView: React.FC<Props> = ({ activeItem }) => {
 
 		const handleFetchRecommendations = async () => {
 			try {
+				setIsLoading(true); // Start loading
 				const recommendationResponse: RecommendationResponse = await fetchRecommendations(
 					user.userId
 				);
@@ -400,6 +410,8 @@ const TabView: React.FC<Props> = ({ activeItem }) => {
 				setShowRecommendations(true);
 			} catch (error) {
 				console.error("Failed to fetch recommendations:", error);
+			} finally {
+				setIsLoading(false); // Stop loading regardless of outcome
 			}
 		};
 
@@ -518,15 +530,33 @@ const TabView: React.FC<Props> = ({ activeItem }) => {
 							<TouchableOpacity
 								style={styles.recommendationButton}
 								onPress={handleFetchRecommendations}
+								disabled={isLoading} // Disable button while loading
 							>
 								<LinearGradient
-									colors={["#1E3A8A", "#2563EB", "#3B82F6"]} // New bluish gradient shades
+									colors={["#1E3A8A", "#2563EB", "#3B82F6"]}
 									style={styles.gradient}
 								>
-									<Ionicons name="compass-outline" size={24} color="white" />
-									<ThemedText style={styles.buttonText}>
-										Get Personalized Recommendations
-									</ThemedText>
+									{isLoading ? (
+										<View style={styles.loadingContainer}>
+											<ActivityIndicator size="small" color="white" />
+											<ThemedText
+												style={[styles.buttonText, styles.loadingText]}
+											>
+												Getting Recommendations...
+											</ThemedText>
+										</View>
+									) : (
+										<>
+											<Ionicons
+												name="compass-outline"
+												size={24}
+												color="white"
+											/>
+											<ThemedText style={styles.buttonText}>
+												Get Personalized Recommendations
+											</ThemedText>
+										</>
+									)}
 								</LinearGradient>
 							</TouchableOpacity>
 						</View>
@@ -1075,11 +1105,6 @@ const styles = StyleSheet.create({
 		fontWeight: "600",
 		color: "#111827",
 	},
-	recommendationDescription: {
-		fontSize: 14,
-		color: "#4B5563",
-		lineHeight: 20,
-	},
 	recommendationReason: {
 		fontSize: 14,
 		color: "#6B7280",
@@ -1250,6 +1275,17 @@ const styles = StyleSheet.create({
 		fontSize: 14,
 		color: "#4B5563",
 		fontStyle: "italic",
+	},
+	loadingContainer: {
+		flexDirection: "row",
+		alignItems: "center",
+		justifyContent: "center",
+		paddingHorizontal: 20,
+	},
+	loadingText: {
+		marginLeft: 10,
+		color: "white",
+		fontSize: 16,
 	},
 });
 
