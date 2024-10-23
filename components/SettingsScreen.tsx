@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
 	View,
 	Text,
@@ -15,13 +15,18 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { deleteAccount } from "@/server/requests";
 import { useUser } from "@/providers/UserContext";
 import { Redirect } from "expo-router";
+import { useDyslexia } from "@/providers/FontContext";
+import { useRouter } from "expo-router";
 
 const SettingsSection = () => {
 	const { user, clearUser } = useUser();
 	const [textSize, setTextSize] = useState(16);
-	const [dyslexiaMode, setDyslexiaMode] = useState(false);
+	const { dyslexiaMode, toggleDyslexiaMode } = useDyslexia();
 	const [highContrastMode, setHighContrastMode] = useState(false);
 	const [voiceGuidance, setVoiceGuidance] = useState(false);
+
+	// Inside the component:
+	const router = useRouter();
 
 	const handleDeleteAccount = () => {
 		Alert.alert(
@@ -38,7 +43,6 @@ const SettingsSection = () => {
 						const response = await deleteAccount(user.userId);
 						if (response) {
 							clearUser();
-							<Redirect href={"/(auth)/welcome"} />;
 						}
 					},
 					style: "destructive",
@@ -47,10 +51,26 @@ const SettingsSection = () => {
 		);
 	};
 
+	const handleSignOutAccount = () => {
+		Alert.alert("Sign Out", "Are you sure you want to sign out?", [
+			{
+				text: "Cancel",
+				style: "cancel",
+			},
+			{
+				text: "Sign out",
+				onPress: () => {
+					clearUser();
+				},
+				style: "destructive",
+			},
+		]);
+	};
+
 	return (
 		<ScrollView style={styles.scrollView}>
 			{/* Accessibility Section */}
-			<ThemedText style={styles.subSectionTitle}>Accessibility</ThemedText>
+			<ThemedText style={styles.sectionTitle}>Accessibility</ThemedText>
 
 			{/* <SettingItem
 				icon="format-size"
@@ -77,7 +97,7 @@ const SettingsSection = () => {
 			>
 				<Switch
 					value={dyslexiaMode}
-					onValueChange={setDyslexiaMode}
+					onValueChange={toggleDyslexiaMode}
 					trackColor={{ false: "#767577", true: "#FA5A5A" }}
 					thumbColor={dyslexiaMode ? "#f4f3f4" : "#f4f3f4"}
 				/>
@@ -114,6 +134,20 @@ const SettingsSection = () => {
 
 			<ThemedView style={styles.settingItem}>
 				<View style={styles.settingHeader}>
+					<Icon name={"account-signout"} size={24} color="#FA5A5A" style={styles.icon} />
+					<Pressable onPress={handleSignOutAccount}>
+						<View style={styles.settingTitleContainer}>
+							<ThemedText style={styles.settingTitle}>{"Sign out"}</ThemedText>
+							<ThemedText style={styles.settingDescription}>
+								{"Sign out of your account!"}
+							</ThemedText>
+						</View>
+					</Pressable>
+				</View>
+			</ThemedView>
+
+			<ThemedView style={styles.settingItem}>
+				<View style={styles.settingHeader}>
 					<Icon name={"account-remove"} size={24} color="#FA5A5A" style={styles.icon} />
 					<Pressable onPress={handleDeleteAccount}>
 						<View style={styles.settingTitleContainer}>
@@ -147,12 +181,12 @@ const styles = StyleSheet.create({
 		padding: 15,
 	},
 	sectionTitle: {
-		fontSize: 24,
+		// fontSize: 24,
 		fontWeight: "bold",
 		marginBottom: 20,
 	},
 	subSectionTitle: {
-		fontSize: 20,
+		// fontSize: 20,
 		fontWeight: "bold",
 		marginTop: 20,
 		marginBottom: 10,

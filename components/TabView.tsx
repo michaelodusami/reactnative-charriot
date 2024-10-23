@@ -17,7 +17,12 @@ import apiInstance from "@/server/axiosInstance";
 import { useUser } from "@/providers/UserContext"; // Import the useUser hook
 
 import { format } from "date-fns";
-import { getCurrentBookings, getHotelById, getUpcomingBookings, getPastBookings } from "@/server/server";
+import {
+	getCurrentBookings,
+	getHotelById,
+	getUpcomingBookings,
+	getPastBookings,
+} from "@/server/server";
 
 type Props = {
 	activeItem: ImageSliderType;
@@ -96,7 +101,7 @@ const TabView: React.FC<Props> = ({ activeItem }) => {
 					<View style={styles.dateItem}>
 						<ThemedText style={styles.dateLabel}>Check-In</ThemedText>
 						<View style={styles.dateCalendarStyle}>
-							<Ionicons name="calendar-outline" size={24} color="black" />
+							<Ionicons name="calendar-outline" size={18} color="black" />
 							<ThemedText style={styles.dateText}>
 								{formatDisplayDate(currentBooking.start_date)}
 							</ThemedText>
@@ -106,7 +111,7 @@ const TabView: React.FC<Props> = ({ activeItem }) => {
 					<View style={styles.dateItem}>
 						<ThemedText style={styles.dateLabel}>Check-Out</ThemedText>
 						<View style={styles.dateCalendarStyle}>
-							<Ionicons name="calendar-outline" size={24} color="black" />
+							<Ionicons name="calendar-outline" size={18} color="black" />
 							<ThemedText style={styles.dateText}>
 								{formatDisplayDate(currentBooking.end_date)}
 							</ThemedText>
@@ -206,7 +211,6 @@ const TabView: React.FC<Props> = ({ activeItem }) => {
 							},
 						}
 					);
-
 
 					if (response.status === 200 || response.status === 201) {
 						Alert.alert("Success", `Your ${requestName} request has been submitted.`);
@@ -354,7 +358,7 @@ const TabView: React.FC<Props> = ({ activeItem }) => {
 					return;
 				}
 
-				const hotelsMap = {};  // Create an object to store hotel data
+				const hotelsMap = {}; // Create an object to store hotel data
 
 				// Use Promise.all to fetch all hotels in parallel
 				await Promise.all(
@@ -368,7 +372,10 @@ const TabView: React.FC<Props> = ({ activeItem }) => {
 							const hotel = await getHotelById(booking["hotel_id"]);
 							hotelsMap[booking["hotel_id"]] = hotel;
 						} catch (error) {
-							console.error(`Failed to fetch hotel for ID ${booking["hotel_id"]}:`, error);
+							console.error(
+								`Failed to fetch hotel for ID ${booking["hotel_id"]}:`,
+								error
+							);
 						}
 					})
 				);
@@ -411,32 +418,39 @@ const TabView: React.FC<Props> = ({ activeItem }) => {
 								<View style={styles.row}>
 									<Ionicons name="business-outline" size={20} color="#666" />
 									<ThemedText style={styles.hotelName}>
-										{hotel ? `${hotel.name}${hotel.location?.city ? `, ${hotel.location.city}` : ''}` : 'Loading...'}
+										{hotel
+											? `${hotel.name}${
+													hotel.location?.city
+														? `, ${hotel.location.city}`
+														: ""
+											  }`
+											: "Loading..."}
 									</ThemedText>
 								</View>
 								<View style={styles.row}>
 									<Ionicons name="bed-outline" size={20} color="#666" />
 									<ThemedText style={styles.roomInfo}>
-										{booking.room_info ?
-											`${booking.room_info.beds} Beds, ${booking.room_info.bathrooms} Bathrooms, ${booking.room_info.size} Size Room`
-											: 'Room information not available'
-										}
+										{booking.room_info
+											? `${booking.room_info.beds} Beds, ${booking.room_info.bathrooms} Bathrooms, ${booking.room_info.size} Size Room`
+											: "Room information not available"}
 									</ThemedText>
 								</View>
 								<View style={styles.row}>
 									<Ionicons name="calendar-outline" size={20} color="#666" />
 									<ThemedText style={styles.dateInfo}>
-										{booking.start_date && booking.end_date ?
-											`${formatDisplayDate(booking.start_date)} to ${formatDisplayDate(booking.end_date)}`
-											: 'Dates not available'
-										}
+										{booking.start_date && booking.end_date
+											? `${formatDisplayDate(
+													booking.start_date
+											  )} to ${formatDisplayDate(booking.end_date)}`
+											: "Dates not available"}
 									</ThemedText>
 								</View>
 								{booking && (
 									<View style={styles.row}>
 										<Ionicons name="key-outline" size={20} color="#666" />
 										<ThemedText style={styles.locationInfo}>
-											Room {booking.room_number || 'Room number not available'}
+											Room{" "}
+											{booking.room_number || "Room number not available"}
 										</ThemedText>
 									</View>
 								)}
@@ -561,7 +575,10 @@ const TabView: React.FC<Props> = ({ activeItem }) => {
 							const hotel = await getHotelById(booking["hotel_id"]);
 							hotelsMap[booking["hotel_id"]] = hotel;
 						} catch (error) {
-							console.error(`Failed to fetch hotel for ID ${booking["hotel_id"]}:`, error);
+							console.error(
+								`Failed to fetch hotel for ID ${booking["hotel_id"]}:`,
+								error
+							);
 						}
 					})
 				);
@@ -602,32 +619,39 @@ const TabView: React.FC<Props> = ({ activeItem }) => {
 								<View style={styles.row}>
 									<Ionicons name="business-outline" size={20} color="#666" />
 									<ThemedText style={styles.hotelName}>
-										{hotel ? `${hotel.name}${hotel.location?.city ? `, ${hotel.location.city}` : ''}` : 'Loading...'}
+										{hotel
+											? `${hotel.name}${
+													hotel.location?.city
+														? `, ${hotel.location.city}`
+														: ""
+											  }`
+											: "Loading..."}
 									</ThemedText>
 								</View>
 								<View style={styles.row}>
 									<Ionicons name="bed-outline" size={20} color="#666" />
 									<ThemedText style={styles.roomInfo}>
-										{booking.room_info ?
-											`${booking.room_info.beds} Beds, ${booking.room_info.bathrooms} Bathrooms, ${booking.room_info.size} Size Room`
-											: 'Room information not available'
-										}
+										{booking.room_info
+											? `${booking.room_info.beds} Beds, ${booking.room_info.bathrooms} Bathrooms, ${booking.room_info.size} Size Room`
+											: "Room information not available"}
 									</ThemedText>
 								</View>
 								<View style={styles.row}>
 									<Ionicons name="calendar-outline" size={20} color="#666" />
 									<ThemedText style={styles.dateInfo}>
-										{booking.start_date && booking.end_date ?
-											`${formatDisplayDate(booking.start_date)} to ${formatDisplayDate(booking.end_date)}`
-											: 'Dates not available'
-										}
+										{booking.start_date && booking.end_date
+											? `${formatDisplayDate(
+													booking.start_date
+											  )} to ${formatDisplayDate(booking.end_date)}`
+											: "Dates not available"}
 									</ThemedText>
 								</View>
 								{booking && (
 									<View style={styles.row}>
 										<Ionicons name="key-outline" size={20} color="#666" />
 										<ThemedText style={styles.locationInfo}>
-											Room {booking.room_number || 'Room number not available'}
+											Room{" "}
+											{booking.room_number || "Room number not available"}
 										</ThemedText>
 									</View>
 								)}
@@ -754,14 +778,14 @@ const styles = StyleSheet.create({
 		gap: 10,
 	},
 	dateLabel: {
-		fontFamily: "EffraFamily",
-		fontSize: 26,
+		// fontFamily: "EffraFamily",
+		// fontSize: 26,
 		fontWeight: "bold",
 		marginTop: 0,
 		marginBottom: 8,
 	},
 	dateText: {
-		fontSize: 16,
+		// fontSize: 16,
 		color: "#666",
 	},
 	verticalDivider: {
@@ -769,8 +793,8 @@ const styles = StyleSheet.create({
 		backgroundColor: "#e0e0e0",
 	},
 	sectionTitle: {
-		fontFamily: "EffraFamily",
-		fontSize: 22,
+		// fontFamily: "EffraFamily",
+		// fontSize: 22,
 		fontWeight: "bold",
 		marginBottom: 16,
 	},
@@ -789,8 +813,8 @@ const styles = StyleSheet.create({
 	},
 	roomDetailText: {
 		marginLeft: 5,
-		fontFamily: "EffraFamily",
-		fontSize: 16,
+		// fontFamily: "EffraFamily",
+		// fontSize: 16,
 	},
 	amenitiesContainer: {
 		marginBottom: 10,
@@ -809,8 +833,8 @@ const styles = StyleSheet.create({
 	},
 	amenityText: {
 		marginLeft: 5,
-		fontFamily: "EffraFamily",
-		fontSize: 16,
+		// fontFamily: "EffraFamily",
+		// fontSize: 16,
 		marginBottom: 6,
 	},
 	requestsContainer: {
@@ -821,8 +845,8 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 20,
 	},
 	categoryTitle: {
-		fontFamily: "EffraFamily",
-		fontSize: 22,
+		// fontFamily: "EffraFamily",
+		// fontSize: 22,
 		fontWeight: "bold",
 		marginBottom: 10,
 	},
@@ -845,7 +869,7 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 	},
 	requestText: {
-		fontFamily: "EffraFamily",
+		// fontFamily: "EffraFamily",
 		fontSize: 16,
 		textAlign: "center",
 		marginTop: 5,
@@ -874,14 +898,14 @@ const styles = StyleSheet.create({
 		marginRight: 10,
 	},
 	eventTitle: {
-		fontFamily: "EffraFamily",
-		fontSize: 22,
+		// fontFamily: "EffraFamily",
+		// fontSize: 22,
 		fontWeight: "bold",
 		flex: 1,
 	},
 	eventDescription: {
-		fontFamily: "EffraFamily",
-		fontSize: 18,
+		// fontFamily: "EffraFamily",
+		// fontSize: 18,
 		marginTop: 10,
 		paddingLeft: 34, // Aligns with the title, accounting for the icon width
 	},
@@ -896,8 +920,8 @@ const styles = StyleSheet.create({
 		paddingBottom: 10,
 	},
 	bookingNumber: {
-		fontFamily: "EffaFamily",
-		fontSize: 18,
+		// fontFamily: "EffaFamily",
+		// fontSize: 18,
 		fontWeight: "bold",
 		marginRight: 10,
 	},
@@ -910,22 +934,22 @@ const styles = StyleSheet.create({
 		marginBottom: 5,
 	},
 	hotelName: {
-		fontFamily: "EffaFamily",
-		fontSize: 18,
+		// fontFamily: "EffaFamily",
+		// fontSize: 18,
 		fontWeight: "600",
 		marginLeft: 10,
 	},
 	roomInfo: {
-		fontFamily: "EffaFamily",
-		fontSize: 16,
+		// fontFamily: "EffaFamily",
+		// fontSize: 16,
 		marginLeft: 10,
 	},
 	locationInfo: {
 		marginHorizontal: 10,
 	},
 	dateInfo: {
-		fontFamily: "EffaFamily",
-		fontSize: 16,
+		// fontFamily: "EffaFamily",
+		// fontSize: 16,
 		marginLeft: 10,
 	},
 	recommendationButton: {
@@ -941,9 +965,9 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 20,
 	},
 	buttonText: {
-		fontFamily: "EffaFamily",
+		// fontFamily: "EffaFamily",
 		color: "white",
-		fontSize: 18,
+		// fontSize: 18,
 		fontWeight: "bold",
 		marginLeft: 10,
 	},
@@ -951,8 +975,8 @@ const styles = StyleSheet.create({
 		marginTop: 20,
 	},
 	recommendationsTitle: {
-		fontFamily: "EffaFamily",
-		fontSize: 18,
+		// fontFamily: "EffaFamily",
+		// fontSize: 18,
 		fontWeight: "bold",
 		marginBottom: 10,
 	},
@@ -962,15 +986,15 @@ const styles = StyleSheet.create({
 		marginBottom: 10,
 	},
 	recommendationText: {
-		fontFamily: "EffaFamily",
-		fontSize: 18,
+		// fontFamily: "EffaFamily",
+		// fontSize: 18,
 		marginLeft: 10,
 	},
 	contactContainer: {
 		padding: 20,
 	},
 	contactTitle: {
-		fontSize: 20,
+		// fontSize: 20,
 		fontWeight: "bold",
 		marginBottom: 20,
 	},
@@ -980,7 +1004,7 @@ const styles = StyleSheet.create({
 		marginBottom: 15,
 	},
 	contactInfo: {
-		fontSize: 18,
+		// fontSize: 18,
 		marginLeft: 15,
 	},
 	chatbotButton: {
@@ -995,7 +1019,7 @@ const styles = StyleSheet.create({
 	},
 	chatbotButtonText: {
 		color: "white",
-		fontSize: 18,
+		// fontSize: 18,
 		fontWeight: "bold",
 		marginLeft: 10,
 	},

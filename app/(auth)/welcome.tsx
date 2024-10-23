@@ -11,6 +11,8 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { PeregrineColors } from "@/constants/Colors";
+import { getCurrentFontName } from "@/functions/fontFunctions";
+import { useDyslexia } from "@/providers/FontContext";
 
 const Onboarding = () => {
 	// Animation values
@@ -19,6 +21,8 @@ const Onboarding = () => {
 	const scaleAnim = useRef(new Animated.Value(0.3)).current;
 	const buttonOpacity = useRef(new Animated.Value(0)).current;
 	const byPeregrineAnim = useRef(new Animated.Value(0)).current;
+
+	const isFontToggled = true;
 
 	useEffect(() => {
 		// Sequence of animations
@@ -147,25 +151,32 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 16,
 		backgroundColor: "white",
 	},
+	toggledFont: {
+		fontFamily: "DyslexiaFont",
+	},
+	defaultFont: {
+		fontFamily: "SpaceMono",
+	},
 	background: {
 		flex: 1,
 		justifyContent: "space-between",
 		alignItems: "center",
 		paddingVertical: 40,
 	},
+
 	content: {
 		alignItems: "center",
 	},
 	header: {
-		fontFamily: "EffraFamily",
 		fontSize: 48,
+
 		color: "black",
 		marginBottom: 10,
 		textShadowOffset: { width: -1, height: 1 },
 		textShadowRadius: 10,
 	},
 	subheader: {
-		fontFamily: "EffraFamily",
+		// fontFamily: "EffraFamily",
 		fontSize: 24,
 		color: "black",
 		marginBottom: 10,
@@ -173,7 +184,7 @@ const styles = StyleSheet.create({
 		textShadowRadius: 10,
 	},
 	byPeregrine: {
-		fontFamily: "EffraFamily",
+		// fontFamily: "EffraFamily",
 		fontSize: 16,
 		color: PeregrineColors.blue,
 		marginTop: 5,
@@ -196,7 +207,7 @@ const styles = StyleSheet.create({
 		elevation: 5,
 	},
 	exploreText: {
-		fontFamily: "EffraFamily",
+		// fontFamily: "EffraFamily",
 		fontSize: 18,
 		color: "white",
 		textTransform: "uppercase",

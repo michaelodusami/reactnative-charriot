@@ -354,13 +354,13 @@ const styles = StyleSheet.create({
 		// marginBottom: 24,
 	},
 	greetingText: {
-		fontSize: 28,
+		// fontSize: 23,
 		fontWeight: "bold",
 		lineHeight: 30,
 		marginLeft: 10,
 	},
 	subHeadingText: {
-		fontSize: 22,
+		// fontSize: 22,
 		marginTop: 8,
 	},
 	messageList: {
@@ -388,7 +388,7 @@ const styles = StyleSheet.create({
 		marginHorizontal: 4,
 	},
 	bookingTypeText: {
-		fontSize: 16,
+		// fontSize: 16,
 		fontWeight: "600",
 	},
 	actionList: {
@@ -418,11 +418,11 @@ const styles = StyleSheet.create({
 		flex: 1,
 	},
 	actionTitle: {
-		fontSize: 16,
+		// fontSize: 16,
 		fontWeight: "600",
 	},
 	actionDescription: {
-		fontSize: 14,
+		// fontSize: 14,
 		marginTop: 4,
 	},
 	inputContainer: {
@@ -436,8 +436,8 @@ const styles = StyleSheet.create({
 	},
 	input: {
 		flex: 1,
-		fontSize: 16,
-		fontFamily: "Poppins",
+		// fontSize: 16,
+		// fontFamily: "Poppins",
 	},
 	iconButton: {
 		marginLeft: 8,

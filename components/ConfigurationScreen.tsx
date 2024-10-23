@@ -376,7 +376,7 @@ const configStyles = StyleSheet.create({
 		fontWeight: "bold",
 	},
 	configDescription: {
-		fontSize: 14,
+		// fontSize: 14,
 		color: "#777",
 	},
 	configContent: {
@@ -397,7 +397,7 @@ const configStyles = StyleSheet.create({
 		marginBottom: 12,
 	},
 	choiceText: {
-		fontSize: 14,
+		// fontSize: 14,
 		fontWeight: "bold",
 		color: "#333",
 		textAlign: "center",
@@ -416,7 +416,7 @@ const configStyles = StyleSheet.create({
 	},
 	saveButtonText: {
 		color: "#FFFFFF",
-		fontSize: 18,
+		// fontSize: 18,
 		fontWeight: "bold",
 	},
 	selectedOption: {
@@ -435,7 +435,7 @@ const configStyles = StyleSheet.create({
 		borderColor: "#ccc",
 		borderRadius: 5,
 		padding: 10,
-		fontSize: 16,
+		// fontSize: 16,
 		width: "100%",
 	},
 });

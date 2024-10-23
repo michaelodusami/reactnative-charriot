@@ -310,16 +310,16 @@ const styles = StyleSheet.create({
 		borderBottomColor: "#E8ECF4",
 	},
 	headerText: {
-		fontSize: 28,
+		// fontSize: 28,
 		fontWeight: "700",
 		color: "#1A1F36",
-		fontFamily: "EffraFamily",
+		// fontFamily: "EffraFamily",
 		marginBottom: 4,
 	},
 	subHeaderText: {
-		fontSize: 16,
+		// fontSize: 16,
 		color: "#6B7280",
-		fontFamily: "EffraFamily",
+		// fontFamily: "EffraFamily",
 	},
 	chartContainer: {
 		margin: 16,
@@ -366,7 +366,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 	},
 	sectionHeaderText: {
-		fontSize: 18,
+		// fontSize: 18,
 		fontWeight: "600",
 		color: "#FFF",
 		marginRight: 8,
@@ -379,7 +379,7 @@ const styles = StyleSheet.create({
 	},
 	countText: {
 		color: "#FFF",
-		fontSize: 14,
+		// fontSize: 14,
 		fontWeight: "600",
 	},
 	sectionContent: {
@@ -407,22 +407,22 @@ const styles = StyleSheet.create({
 		flex: 1,
 	},
 	requestTask: {
-		fontSize: 16,
+		// fontSize: 16,
 		fontWeight: "600",
 		color: "#1A1F36",
 		marginBottom: 4,
-		fontFamily: "EffraFamily",
+		// fontFamily: "EffraFamily",
 	},
 	requestDetails: {
-		fontSize: 14,
+		// fontSize: 14,
 		color: "#6B7280",
-		fontFamily: "EffraFamily",
+		// fontFamily: "EffraFamily",
 	},
 	completedText: {
-		fontSize: 14,
+		// fontSize: 14,
 		color: "#45B7D1",
 		marginTop: 4,
-		fontFamily: "EffraFamily",
+		// fontFamily: "EffraFamily",
 	},
 });
 

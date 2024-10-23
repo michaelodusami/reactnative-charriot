@@ -15,6 +15,7 @@ import ConfigurationSection from "@/components/ConfigurationScreen";
 import SettingsSection from "@/components/SettingsScreen";
 import { useUser } from "@/providers/UserContext";
 import { capitalizeAndGetUsername } from "@/functions/userFunctions";
+import { Redirect } from "expo-router";
 // Section Components
 
 // const PersonalInfoSection = () => (
@@ -49,7 +50,9 @@ const Profile = () => {
 		}
 	};
 
-	console.log(user);
+	if (!user.userId) {
+		return <Redirect href={"/(auth)/welcome"} />;
+	}
 
 	return (
 		<SafeArea style={styles.container}>
@@ -120,15 +123,15 @@ const styles = StyleSheet.create({
 		marginBottom: 20,
 	},
 	userName: {
-		fontFamily: "EffraFamily",
-		fontSize: 22,
+		// fontFamily: "EffraFamily",
+		// fontSize: 22,
 		fontWeight: "bold",
 		marginBottom: 10,
 	},
 	email: {
 		color: "#666",
-		fontFamily: "EffraFamily",
-		fontSize: 16,
+		// fontFamily: "EffraFamily",
+		// fontSize: 16,
 	},
 	tabContainer: {
 		flexDirection: "row",
@@ -145,7 +148,7 @@ const styles = StyleSheet.create({
 		borderBottomColor: "#FA5A5A",
 	},
 	tabText: {
-		fontSize: 16,
+		// fontSize: 16,
 		fontWeight: "bold",
 	},
 	activeTabText: {
@@ -161,8 +164,8 @@ const styles = StyleSheet.create({
 		padding: 15,
 	},
 	sectionTitle: {
-		fontFamily: "EffraFamily",
-		fontSize: 22,
+		// fontFamily: "EffraFamily",
+		// fontSize: 22,
 		fontWeight: "bold",
 		marginBottom: 10,
 	},
@@ -181,8 +184,8 @@ const styles = StyleSheet.create({
 	saveButtonText: {
 		color: "black",
 		fontWeight: "bold",
-		fontFamily: "EffraFamily",
-		fontSize: 16,
+		// fontFamily: "EffraFamily",
+		// fontSize: 16,
 	},
 	optionRow: {
 		flexDirection: "row",
@@ -204,8 +207,8 @@ const styles = StyleSheet.create({
 		backgroundColor: "#FA5A5A",
 	},
 	optionText: {
-		fontFamily: "EffraFamily",
-		fontSize: 28,
+		// fontFamily: "EffraFamily",
+		// fontSize: 28,
 		fontWeight: "bold",
 		color: "#333",
 	},

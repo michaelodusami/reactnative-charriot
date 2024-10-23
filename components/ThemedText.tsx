@@ -1,6 +1,8 @@
 import { Text, type TextProps, StyleSheet } from "react-native";
 
 import { useThemeColor } from "@/hooks/useThemeColor";
+import { useDyslexia } from "@/providers/FontContext";
+import { fontStyles } from "@/constants/styles";
 
 export type ThemedTextProps = TextProps & {
 	lightColor?: string;
@@ -16,7 +18,8 @@ export function ThemedText({
 	...rest
 }: ThemedTextProps) {
 	const color = useThemeColor({ light: lightColor, dark: darkColor }, "text");
-
+	const { dyslexiaMode } = useDyslexia();
+	const fontFamily = dyslexiaMode ? fontStyles.dyslexiaFont : fontStyles.regularFont;
 	return (
 		<Text
 			style={[
@@ -26,7 +29,9 @@ export function ThemedText({
 				type === "defaultSemiBold" ? styles.defaultSemiBold : undefined,
 				type === "subtitle" ? styles.subtitle : undefined,
 				type === "link" ? styles.link : undefined,
+
 				style,
+				fontFamily,
 			]}
 			{...rest}
 		/>
