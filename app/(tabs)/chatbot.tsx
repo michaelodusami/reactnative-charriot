@@ -256,29 +256,36 @@ const ChatBotScreen = () => {
 
 	return (
 		<SafeArea style={styles.container}>
-			<TouchableOpacity onPress={handleBackToDefault}>
-				<Icon name="arrow-left" size={24} color={colors.primary} />
-			</TouchableOpacity>
-			<View style={styles.header}>
-				<ThemedText style={styles.greetingText}>
-					Hey, {capitalizeAndGetUsername(user.userId)}
-				</ThemedText>
-				<ThemedText style={styles.subHeadingText}>How can I help you today?</ThemedText>
-			</View>
+			{!showOptions && (
+				<TouchableOpacity onPress={handleBackToDefault}>
+					<Icon name="arrow-left" size={24} color={colors.primary} />
+				</TouchableOpacity>
+			)}
 
-			<FlatList
-				ref={flatListRef}
-				data={messages}
-				renderItem={renderMessage}
-				keyExtractor={(item) => item.id}
-				contentContainerStyle={styles.messageList}
-				onContentSizeChange={scrollToBottom} // Automatically scroll to bottom when content changes
-			/>
+			{showOptions && (
+				<View style={styles.header}>
+					<ThemedText style={styles.greetingText}>
+						Hey, {capitalizeAndGetUsername(user.userId)}
+					</ThemedText>
+					<ThemedText style={styles.subHeadingText}>How can I help you today?</ThemedText>
+				</View>
+			)}
+
+			{!showOptions && (
+				<FlatList
+					ref={flatListRef}
+					data={messages}
+					renderItem={renderMessage}
+					keyExtractor={(item) => item.id}
+					contentContainerStyle={styles.messageList}
+					onContentSizeChange={scrollToBottom} // Automatically scroll to bottom when content changes
+				/>
+			)}
 
 			{showOptions && (
 				<>
 					<View style={styles.bookingTypeContainer}>
-						<ThemedText style={styles.sectionTitle}>Booking Type:</ThemedText>
+						{/* <ThemedText style={styles.sectionTitle}>Booking Type:</ThemedText> */}
 						<View style={styles.bookingTypeRow}>
 							{["current", "past", "upcoming"].map((type) => (
 								<TouchableOpacity
@@ -351,16 +358,17 @@ const styles = StyleSheet.create({
 	header: {
 		// flexDirection: "row",
 		alignItems: "center",
-		// marginBottom: 24,
+		marginBottom: 24,
+		marginTop: 16,
 	},
 	greetingText: {
-		// fontSize: 23,
+		fontSize: 23,
 		fontWeight: "bold",
 		lineHeight: 30,
-		marginLeft: 10,
+		// marginLeft: 10,
 	},
 	subHeadingText: {
-		// fontSize: 22,
+		fontSize: 16,
 		marginTop: 8,
 	},
 	messageList: {
