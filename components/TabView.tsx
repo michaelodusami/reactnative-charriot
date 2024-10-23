@@ -100,7 +100,7 @@ const TabView: React.FC<Props> = ({ activeItem }) => {
 		}
 
 		const DetailsTab = () => (
-			<View style={styles.detailsContainer}>
+			<ScrollView style={styles.detailsContainer}>
 				<View style={styles.dateContainer}>
 					<View style={styles.dateItem}>
 						<ThemedText style={styles.dateLabel}>Check-In</ThemedText>
@@ -165,7 +165,7 @@ const TabView: React.FC<Props> = ({ activeItem }) => {
 							})}
 					</View>
 				</View>
-			</View>
+			</ScrollView>
 		);
 
 		const RequestsTab: React.FC<Props> = ({ activeItem, userEmail }) => {
@@ -515,48 +515,12 @@ const TabView: React.FC<Props> = ({ activeItem }) => {
 				<ScrollView style={styles.scrollView}>
 					{!showRecommendations ? (
 						<View style={styles.initialView}>
-							<View style={styles.summaryCard}>
-								<ThemedText style={styles.summaryTitle}>
-									Your Travel Profile
-								</ThemedText>
-								<View style={styles.summaryContent}>
-									<View style={styles.summaryItem}>
-										<Ionicons
-											name="location-outline"
-											size={24}
-											color="#4F46E5"
-										/>
-										<View>
-											<ThemedText style={styles.summaryLabel}>
-												Current Location
-											</ThemedText>
-											<ThemedText style={styles.summaryValue}>
-												{travelSummary?.current_location || "Not available"}
-											</ThemedText>
-										</View>
-									</View>
-									<View style={styles.summaryItem}>
-										<Ionicons name="time-outline" size={24} color="#4F46E5" />
-										<View>
-											<ThemedText style={styles.summaryLabel}>
-												Average Stay
-											</ThemedText>
-											<ThemedText style={styles.summaryValue}>
-												{travelSummary?.travel_patterns
-													?.average_stay_duration || 0}{" "}
-												days
-											</ThemedText>
-										</View>
-									</View>
-								</View>
-							</View>
-
 							<TouchableOpacity
 								style={styles.recommendationButton}
 								onPress={handleFetchRecommendations}
 							>
 								<LinearGradient
-									colors={["#4F46E5", "#4338CA", "#3730A3"]}
+									colors={["#1E3A8A", "#2563EB", "#3B82F6"]} // New bluish gradient shades
 									style={styles.gradient}
 								>
 									<Ionicons name="compass-outline" size={24} color="white" />
@@ -912,8 +876,8 @@ const styles = StyleSheet.create({
 		gap: 10,
 	},
 	dateLabel: {
-		// fontFamily: "EffraFamily",
-		// fontSize: 26,
+		fontFamily: "EffraFamily",
+		fontSize: 26,
 		fontWeight: "bold",
 		marginTop: 0,
 		marginBottom: 8,
@@ -1086,25 +1050,6 @@ const styles = StyleSheet.create({
 		// fontSize: 16,
 		marginLeft: 10,
 	},
-	recommendationButton: {
-		borderRadius: 25,
-		overflow: "hidden",
-		marginBottom: 20,
-	},
-	gradient: {
-		flexDirection: "row",
-		alignItems: "center",
-		justifyContent: "center",
-		paddingVertical: 12,
-		paddingHorizontal: 20,
-	},
-	buttonText: {
-		// fontFamily: "EffaFamily",
-		color: "white",
-		// fontSize: 18,
-		fontWeight: "bold",
-		marginLeft: 10,
-	},
 	recommendationsList: {
 		gap: 16,
 	},
@@ -1223,8 +1168,9 @@ const styles = StyleSheet.create({
 		gap: 8,
 	},
 	buttonText: {
+		fontFamily: "EffraFamily",
 		color: "#FFFFFF",
-		fontSize: 16,
+		fontSize: 18,
 		fontWeight: "600",
 	},
 	recommendationsContainer: {

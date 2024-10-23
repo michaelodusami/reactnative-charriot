@@ -398,7 +398,7 @@ export const fetchUserInteractions = async (
 /**
  * Sends a chat message to the /api/rag/interactions/chat endpoint.
  *
- * @param params - Object containing user_id, booking_id, question, and booking_type.
+ * @param params - Object containing user_id, booking_id, question, booking_type, and target_language.
  * @returns The response from the API, containing the chatbot's reply.
  */
 export const sendChatMessage = async (params: {
@@ -406,14 +406,29 @@ export const sendChatMessage = async (params: {
 	booking_id: string;
 	question: string;
 	booking_type: string;
+	target_language?: string; // Optional target language field
 }) => {
 	try {
-		const response = await apiInstance.post("/api/rag/interactions/chat", params, {
-			headers: {
-				Accept: "application/json",
-				"Content-Type": "application/json",
-			},
-		});
+		// Define the request payload, ensuring default to 'en' (English) if no target_language is provided
+		const requestData = {
+			...params,
+			target_language: params.target_language || "en", // Default to 'en' if target_language is not provided
+		};
+
+		console.log(requestData);
+
+		const response = await apiInstance.post(
+			`/api/rag/interactions/chat?target_language=${requestData.target_language}`,
+			requestData,
+			{
+				headers: {
+					Accept: "application/json",
+					"Content-Type": "application/json",
+				},
+			}
+		);
+
+		console.log(response);
 
 		// Check if response data exists and return the correct structure
 		if (response && response.data && response.data.response_content) {
@@ -426,7 +441,6 @@ export const sendChatMessage = async (params: {
 		throw error;
 	}
 };
-
 /**
  * Fetches previous user interactions (chat history) from the /api/rag/interactions/user/{user_id} endpoint.
  *

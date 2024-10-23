@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useEffect, useRef } from "react";
-import { View, TextInput, StyleSheet, FlatList, TouchableOpacity } from "react-native";
+import { View, TextInput, StyleSheet, FlatList, TouchableOpacity, Modal } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import SafeArea from "@/components/SafeArea";
 import { ThemedText } from "@/components/ThemedText";
@@ -13,6 +13,8 @@ import {
 	getUserInteractions,
 } from "@/server/server";
 import { capitalizeAndGetUsername } from "@/functions/userFunctions";
+import { Picker } from "@react-native-picker/picker";
+import LANGUAGES from "@/data/Languages";
 
 const quickActionsMap: any = {
 	current: [
@@ -81,6 +83,13 @@ const ChatBotScreen = () => {
 	const [showOptions, setShowOptions] = useState<boolean>(true); // Controls visibility of quick actions
 	const { colors } = useTheme();
 	const flatListRef = useRef<FlatList>(null); // Reference to the FlatList for scrolling
+	const [selectedLanguage, setSelectedLanguage] = useState("en"); // Default to English
+	const [showLanguageModal, setShowLanguageModal] = useState(false); // Modal visibility
+
+	const handleLanguageChange = (language: string) => {
+		setSelectedLanguage(language);
+		setShowLanguageModal(false);
+	};
 
 	// Scroll to the bottom of the list whenever new messages are added
 	const scrollToBottom = () => {
@@ -178,6 +187,7 @@ const ChatBotScreen = () => {
 					booking_id: bookingId,
 					question: message,
 					booking_type: bookingType,
+					target_language: selectedLanguage,
 				});
 
 				if (response && response.response_content) {
@@ -256,6 +266,41 @@ const ChatBotScreen = () => {
 
 	return (
 		<SafeArea style={styles.container}>
+			<View style={styles.header}>
+				{/* Language selection button */}
+				<TouchableOpacity
+					style={styles.languageButton}
+					onPress={() => setShowLanguageModal(true)}
+				>
+					<Icon name="translate" size={20} color="#fff" />
+					<ThemedText style={styles.languageButtonText}>Language</ThemedText>
+				</TouchableOpacity>
+			</View>
+
+			{/* Modal for language selection */}
+			<Modal visible={showLanguageModal} transparent={true} animationType="slide">
+				<View style={styles.modalContainer}>
+					<View style={styles.modalContent}>
+						<ThemedText style={styles.modalTitle}>Select a Language</ThemedText>
+						<Picker
+							selectedValue={selectedLanguage}
+							onValueChange={(itemValue) => handleLanguageChange(itemValue)}
+							style={{ backgroundColor: "#f0f0f0", width: 200 }} // Explicit width for visibility
+						>
+							{Object.entries(LANGUAGES).map(([language, code]) => (
+								<Picker.Item key={code} label={language} value={code} />
+							))}
+						</Picker>
+						<TouchableOpacity
+							style={styles.closeModalButton}
+							onPress={() => setShowLanguageModal(false)}
+						>
+							<ThemedText style={styles.closeModalText}>Close</ThemedText>
+						</TouchableOpacity>
+					</View>
+				</View>
+			</Modal>
+
 			{!showOptions && (
 				<TouchableOpacity onPress={handleBackToDefault}>
 					<Icon name="arrow-left" size={24} color={colors.primary} />
@@ -361,6 +406,35 @@ const styles = StyleSheet.create({
 		marginBottom: 24,
 		marginTop: 16,
 	},
+	modalContainer: {
+		flex: 1,
+		justifyContent: "center",
+		alignItems: "center",
+		backgroundColor: "rgba(0, 0, 0, 0.5)", // Darken background
+	},
+	modalContent: {
+		width: "80%",
+		backgroundColor: "#fff",
+		borderRadius: 12,
+		padding: 16,
+		minHeight: 200, // Ensure there is enough height to display the content
+		alignItems: "center",
+	},
+	modalTitle: {
+		fontSize: 18,
+		fontWeight: "bold",
+		marginBottom: 16,
+	},
+	closeModalButton: {
+		marginTop: 20,
+		backgroundColor: "#2563EB",
+		padding: 10,
+		borderRadius: 8,
+	},
+	closeModalText: {
+		color: "#fff",
+		fontWeight: "600",
+	},
 	greetingText: {
 		fontSize: 23,
 		fontWeight: "bold",
@@ -449,6 +523,22 @@ const styles = StyleSheet.create({
 	},
 	iconButton: {
 		marginLeft: 8,
+	},
+	languageButton: {
+		flexDirection: "row", // Icon and text in a row
+		alignItems: "center", // Align items in the center vertically
+		backgroundColor: "#2563EB", // Professional blue background
+		paddingVertical: 10, // Padding for vertical space
+		paddingHorizontal: 16, // Padding for horizontal space
+		borderRadius: 8, // Rounded corners
+		marginTop: 16, // Space above the button
+		alignSelf: "flex-end", // Align the button to the right
+	},
+	languageButtonText: {
+		color: "#fff", // White text to contrast with blue background
+		marginLeft: 8, // Space between icon and text
+		fontSize: 14, // Text size
+		fontWeight: "600", // Semi-bold text
 	},
 });
 
