@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
 	View,
 	Text,
@@ -17,6 +17,9 @@ import { useUser } from "@/providers/UserContext";
 import { capitalizeAndGetUsername } from "@/functions/userFunctions";
 import { Redirect } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { getLoyaltyStatus } from "@/server/server";
+
+
 // Section Components
 
 // const PersonalInfoSection = () => (
@@ -36,6 +39,25 @@ import { Ionicons } from "@expo/vector-icons";
 const Profile = () => {
 	const { user } = useUser();
 	const [selectedSection, setSelectedSection] = useState("Configuration");
+	// Add this line:
+	const [loyaltyStatus, setLoyaltyStatus] = useState(null);
+
+	// Add this useEffect
+	useEffect(() => {
+		const fetchLoyaltyStatus = async () => {
+			try {
+				const status = await getLoyaltyStatus(user.userId);
+				console.log("Status = ", status);
+				setLoyaltyStatus(status);
+			} catch (error) {
+				console.error("Error fetching loyalty status:", error);
+			}
+		};
+
+		if (user.userId) {
+			fetchLoyaltyStatus();
+		}
+	}, [user.userId]);
 
 	// Function to render selected section component
 	const renderSection = () => {
@@ -85,26 +107,26 @@ const Profile = () => {
 				<View
 					style={[
 						styles.loyaltyBadge,
-						user.loyalty_program === "gold" && styles.goldBadge,
-						user.loyalty_program === "silver" && styles.silverBadge,
-						user.loyalty_program === "bronze" && styles.bronzeBadge,
+						loyaltyStatus === "gold" && styles.goldBadge,
+						loyaltyStatus === "silver" && styles.silverBadge,
+						loyaltyStatus=== "bronze" && styles.bronzeBadge,
 					]}
 				>
 					<Ionicons
 						name="diamond-outline"
 						size={16}
-						color={getLoyaltyIconColor(user.loyalty_program)}
+						color={getLoyaltyIconColor(loyaltyStatus)}
 						style={styles.loyaltyIcon}
 					/>
 					<ThemedText
 						style={[
 							styles.loyaltyText,
-							user.loyalty_program === "gold" && styles.goldText,
-							user.loyalty_program === "silver" && styles.silverText,
-							user.loyalty_program === "bronze" && styles.bronzeText,
+							loyaltyStatus === "gold" && styles.goldText,
+							loyaltyStatus === "silver" && styles.silverText,
+							loyaltyStatus === "bronze" && styles.bronzeText,
 						]}
 					>
-						{user.loyalty_program?.toUpperCase()} MEMBER
+						{loyaltyStatus?.toUpperCase()} MEMBER
 					</ThemedText>
 				</View>
 			</View>

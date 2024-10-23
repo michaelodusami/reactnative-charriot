@@ -19,6 +19,20 @@ export const updateUserPreferences = async (user_id: string, preferences: object
 };
 
 /**
+ * @param hotel_id - The ID of the hotel.
+ * @returns The hotel data.
+ */
+export const getLoyaltyStatus = async (user_id: string) => {
+	try {
+		const response = await apiInstance.get(`/api/auth/user/${user_id}`);
+		console.log("Response data = ", response.data.loyalty_program);
+		return response.data.loyalty_program;
+	} catch (err) {
+		throw err;
+	}
+};
+
+/**
  * Get user preferences.
  * @param user_id - The ID of the user.
  * @returns The user preferences data.
