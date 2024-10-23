@@ -295,7 +295,8 @@ const RequestsTab: React.FC = () => {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: "#F7F9FC",
+		// paddingHorizontal: 16,
+		paddingVertical: 24,
 	},
 	loadingContainer: {
 		flex: 1,

@@ -460,3 +460,100 @@ export const getUserInteractions = async (
 		throw error;
 	}
 };
+
+/**
+ * Fetch recommendations for a user based on their past and upcoming travel data.
+ *
+ * @param userId - The unique identifier of the user whose recommendations are being fetched.
+ * @returns A promise that resolves to a recommendation object containing travel summary, recommendations, and generated date.
+ *
+ * Example response:
+ * ```json
+ * {
+ *   "user_id": "example@example.com",
+ *   "travel_summary": {
+ *     "past_locations": ["Miami, Florida, US"],
+ *     "current_location": "Miami, Florida, US",
+ *     "upcoming_location": "Miami, Florida, US",
+ *     "total_stays": 4,
+ *     "favorite_locations": ["Miami, Florida, US"],
+ *     "travel_patterns": {
+ *       "seasonal_preference": {
+ *         "fall": 3
+ *       },
+ *       "average_stay_duration": 0.3,
+ *       "booking_frequency": "occasional",
+ *       "location_types": []
+ *     }
+ *   },
+ *   "recommendations": [
+ *     {
+ *       "title": "Explore Wynwood Walls in Miami",
+ *       "description": "Visit the vibrant Wynwood Walls...",
+ *       "type": "activity",
+ *       "priority": "high",
+ *       "reason": "Based on your past stays in Miami...",
+ *       "target_location": "Miami, Florida",
+ *       "estimated_cost": "Free to explore",
+ *       "recommendation_id": "some-id",
+ *       "user_id": "example@example.com",
+ *       "status": "active"
+ *     }
+ *   ],
+ *   "generated_at": "2024-10-22T19:46:33.179467-04:00"
+ * }
+ * ```
+ */
+export const fetchRecommendations = async (userId: string): Promise<RecommendationResponse> => {
+	try {
+		const response = await apiInstance.get(`/api/recommendation/recommendations/${userId}`);
+		return response.data;
+	} catch (error) {
+		console.error("Error fetching recommendations:", error);
+		throw error;
+	}
+};
+
+// Types
+export interface TravelPatterns {
+	seasonal_preference: Record<string, number>;
+	average_stay_duration: number;
+	booking_frequency: string;
+	location_types: string[];
+}
+
+export interface TravelSummary {
+	past_locations: string[];
+	current_location: string;
+	upcoming_location: string;
+	total_stays: number;
+	favorite_locations: string[];
+	travel_patterns: TravelPatterns;
+}
+
+export interface Recommendation {
+	title: string;
+	description: string;
+	type: string;
+	priority: string;
+	reason: string;
+	source_locations: string[];
+	target_location: string;
+	estimated_cost: string;
+	seasonal_relevance: string | null;
+	tags: string[] | null;
+	recommendation_id: string;
+	user_id: string;
+	upcoming_booking_id: string;
+	created_at: string;
+	updated_at: string;
+	status: string;
+	engagement_score: number | null;
+}
+
+export interface RecommendationResponse {
+	user_id: string;
+	travel_summary: TravelSummary;
+	recommendations: Recommendation[];
+	generated_at: string;
+}

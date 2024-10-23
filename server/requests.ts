@@ -115,8 +115,6 @@ const preferencesEndPoints = {
 
 export const updateUserPreferences = async (userId: string, preferences: any) => {
 	try {
-		console.log("Preferences = ", preferences);
-		console.log("User ID = ", userId);
 		const response = await apiInstance.put(
 			`https://p5vfoq23g5ps45rtvky2xydcxe0sbwph.lambda-url.us-east-1.on.aws/api/auth/users/${userId}/preferences`,
 			preferences

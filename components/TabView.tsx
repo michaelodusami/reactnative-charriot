@@ -22,6 +22,10 @@ import {
 	getHotelById,
 	getUpcomingBookings,
 	getPastBookings,
+	Recommendation,
+	fetchRecommendations,
+	TravelSummary,
+	RecommendationResponse,
 } from "@/server/server";
 
 type Props = {
@@ -337,15 +341,16 @@ const TabView: React.FC<Props> = ({ activeItem }) => {
 		const { user } = useUser();
 		const [activeTab, setActiveTab] = useState("Details");
 		const [showRecommendations, setShowRecommendations] = useState(false);
+		const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
+		const [travelSummary, setTravelSummary] = useState<TravelSummary | null>(null);
 		const [upcomingBookings, setUpcomingBookings] = useState([]);
 		const [upcomingHotels, setUpcomingHotels] = useState({});
 
 		const fetchUpcomingBookings = async () => {
 			try {
-				//const booking = await getCurrnetUserBooking(user.userId);
 				const booking = await getUpcomingBookings(user.userId);
 				console.log("Upcoming booking data = ", booking);
-				setUpcomingBookings(booking); // Assuming the booking API returns an array
+				setUpcomingBookings(booking);
 			} catch (error) {
 				console.error("Failed to fetch upcoming bookings:", error);
 			}
@@ -358,9 +363,8 @@ const TabView: React.FC<Props> = ({ activeItem }) => {
 					return;
 				}
 
-				const hotelsMap = {}; // Create an object to store hotel data
+				const hotelsMap = {};
 
-				// Use Promise.all to fetch all hotels in parallel
 				await Promise.all(
 					upcomingBookings.map(async (booking) => {
 						if (!booking["hotel_id"]) {
@@ -386,7 +390,19 @@ const TabView: React.FC<Props> = ({ activeItem }) => {
 			}
 		};
 
-		// Update useEffect dependencies
+		const handleFetchRecommendations = async () => {
+			try {
+				const recommendationResponse: RecommendationResponse = await fetchRecommendations(
+					user.userId
+				);
+				setRecommendations(recommendationResponse.recommendations);
+				setTravelSummary(recommendationResponse.travel_summary);
+				setShowRecommendations(true);
+			} catch (error) {
+				console.error("Failed to fetch recommendations:", error);
+			}
+		};
+
 		useEffect(() => {
 			if (user?.userId) {
 				fetchUpcomingBookings();
@@ -399,18 +415,15 @@ const TabView: React.FC<Props> = ({ activeItem }) => {
 			}
 		}, [upcomingBookings]);
 
-		// Helper function to format the date
 		const formatDisplayDate = (dateString) => {
 			return format(new Date(dateString), "EEE, MMM d");
 		};
 
-		// Updated DetailsTab to use both bookings and hotels data
 		const DetailsTab = () => (
 			<ScrollView style={styles.scrollView}>
 				<ThemedText style={styles.sectionTitle}>Upcoming Bookings</ThemedText>
 				{upcomingBookings.map((booking, index) => {
 					const hotel = upcomingHotels[booking.hotel_id];
-					console.log("Hotel = ", hotel);
 					return (
 						<View key={booking.id || index} style={styles.bookingItem}>
 							<ThemedText style={styles.bookingNumber}>{index + 1}.</ThemedText>
@@ -461,49 +474,171 @@ const TabView: React.FC<Props> = ({ activeItem }) => {
 			</ScrollView>
 		);
 
-		// GetRecommendationsTab to display trip recommendations
-		const GetRecommendationsTab = () => (
-			<ScrollView style={styles.scrollView}>
-				<TouchableOpacity
-					style={styles.recommendationButton}
-					onPress={() => setShowRecommendations(true)}
-				>
-					<LinearGradient
-						colors={["#56CCF2", "#2F80ED", "#1B74E4"]}
-						style={styles.gradient}
-					>
-						<Ionicons name="sparkles-outline" size={24} color="white" />
-						<ThemedText style={styles.buttonText}>Get Ideas</ThemedText>
-					</LinearGradient>
-				</TouchableOpacity>
-				{showRecommendations && (
-					<View style={styles.recommendationsList}>
-						<ThemedText style={styles.recommendationsTitle}>
-							Suggestions for your trip:
-						</ThemedText>
-						{[
-							"Visit the iconic Empire State Building",
-							"Take a stroll in Central Park",
-							"Explore the Metropolitan Museum of Art",
-							"Enjoy a Broadway show",
-							"Try New York-style pizza",
-							"Take a boat tour around Manhattan",
-						].map((item, index) => (
-							<View key={index} style={styles.recommendationItem}>
-								<Ionicons
-									name="checkmark-circle-outline"
-									size={20}
-									color="#4c669f"
-								/>
-								<ThemedText style={styles.recommendationText}>{item}</ThemedText>
-							</View>
-						))}
-					</View>
-				)}
-			</ScrollView>
-		);
+		const GetRecommendationsTab = () => {
+			const renderActivityIcon = (type) => {
+				switch (type?.toLowerCase()) {
+					case "activity":
+						return "walk-outline";
+					case "dining":
+						return "restaurant-outline";
+					case "attraction":
+						return "camera-outline";
+					case "entertainment":
+						return "ticket-outline";
+					default:
+						return "star-outline";
+				}
+			};
 
-		// Renders the selected tab's content
+			const renderPriorityBadge = (priority) => {
+				const priorityColors = {
+					high: "#EF4444",
+					medium: "#F59E0B",
+					low: "#10B981",
+				};
+
+				return (
+					<View
+						style={[
+							styles.priorityBadge,
+							{ backgroundColor: priorityColors[priority?.toLowerCase()] },
+						]}
+					>
+						<ThemedText style={styles.priorityText}>
+							{priority?.toUpperCase()}
+						</ThemedText>
+					</View>
+				);
+			};
+
+			return (
+				<ScrollView style={styles.scrollView}>
+					{!showRecommendations ? (
+						<View style={styles.initialView}>
+							<View style={styles.summaryCard}>
+								<ThemedText style={styles.summaryTitle}>
+									Your Travel Profile
+								</ThemedText>
+								<View style={styles.summaryContent}>
+									<View style={styles.summaryItem}>
+										<Ionicons
+											name="location-outline"
+											size={24}
+											color="#4F46E5"
+										/>
+										<View>
+											<ThemedText style={styles.summaryLabel}>
+												Current Location
+											</ThemedText>
+											<ThemedText style={styles.summaryValue}>
+												{travelSummary?.current_location || "Not available"}
+											</ThemedText>
+										</View>
+									</View>
+									<View style={styles.summaryItem}>
+										<Ionicons name="time-outline" size={24} color="#4F46E5" />
+										<View>
+											<ThemedText style={styles.summaryLabel}>
+												Average Stay
+											</ThemedText>
+											<ThemedText style={styles.summaryValue}>
+												{travelSummary?.travel_patterns
+													?.average_stay_duration || 0}{" "}
+												days
+											</ThemedText>
+										</View>
+									</View>
+								</View>
+							</View>
+
+							<TouchableOpacity
+								style={styles.recommendationButton}
+								onPress={handleFetchRecommendations}
+							>
+								<LinearGradient
+									colors={["#4F46E5", "#4338CA", "#3730A3"]}
+									style={styles.gradient}
+								>
+									<Ionicons name="compass-outline" size={24} color="white" />
+									<ThemedText style={styles.buttonText}>
+										Get Personalized Recommendations
+									</ThemedText>
+								</LinearGradient>
+							</TouchableOpacity>
+						</View>
+					) : (
+						<View style={styles.recommendationsContainer}>
+							<ThemedText style={styles.recommendationsHeader}>
+								Personalized Recommendations
+							</ThemedText>
+
+							{recommendations.map((recommendation) => (
+								<View
+									key={recommendation.recommendation_id}
+									style={styles.recommendationCard}
+								>
+									<View style={styles.recommendationHeader}>
+										<View style={styles.iconContainer}>
+											<Ionicons
+												name={renderActivityIcon(recommendation.type)}
+												size={24}
+												color="#4F46E5"
+											/>
+										</View>
+										{recommendation.priority &&
+											renderPriorityBadge(recommendation.priority)}
+									</View>
+
+									<ThemedText style={styles.recommendationTitle}>
+										{recommendation.title}
+									</ThemedText>
+
+									<ThemedText style={styles.recommendationDescription}>
+										{recommendation.description}
+									</ThemedText>
+
+									<View style={styles.recommendationDetails}>
+										{recommendation.estimated_cost && (
+											<View style={styles.detailItem}>
+												<Ionicons
+													name="cash-outline"
+													size={16}
+													color="#6B7280"
+												/>
+												<ThemedText style={styles.detailText}>
+													{recommendation.estimated_cost}
+												</ThemedText>
+											</View>
+										)}
+
+										{recommendation.type && (
+											<View style={styles.detailItem}>
+												<Ionicons
+													name="pricetag-outline"
+													size={16}
+													color="#6B7280"
+												/>
+												<ThemedText style={styles.detailText}>
+													{recommendation.type.charAt(0).toUpperCase() +
+														recommendation.type.slice(1)}
+												</ThemedText>
+											</View>
+										)}
+									</View>
+
+									<View style={styles.reasonContainer}>
+										<ThemedText style={styles.reasonText}>
+											{recommendation.reason}
+										</ThemedText>
+									</View>
+								</View>
+							))}
+						</View>
+					)}
+				</ScrollView>
+			);
+		};
+
 		const renderTabContent = () => {
 			switch (activeTab) {
 				case "Details":
@@ -515,7 +650,6 @@ const TabView: React.FC<Props> = ({ activeItem }) => {
 			}
 		};
 
-		// Main component rendering tabs and content
 		return (
 			<>
 				<View style={styles.tabContainer}>
@@ -972,23 +1106,40 @@ const styles = StyleSheet.create({
 		marginLeft: 10,
 	},
 	recommendationsList: {
-		marginTop: 20,
+		gap: 16,
 	},
 	recommendationsTitle: {
-		// fontFamily: "EffaFamily",
-		// fontSize: 18,
-		fontWeight: "bold",
-		marginBottom: 10,
+		fontSize: 18,
+		fontWeight: "600",
+		color: "#111827",
+		marginBottom: 8,
 	},
 	recommendationItem: {
-		flexDirection: "row",
-		alignItems: "center",
-		marginBottom: 10,
+		backgroundColor: "#FFFFFF",
+		borderRadius: 12,
+		padding: 16,
+		gap: 8,
+		shadowColor: "#000",
+		shadowOffset: { width: 0, height: 1 },
+		shadowOpacity: 0.1,
+		shadowRadius: 2,
+		elevation: 2,
 	},
 	recommendationText: {
-		// fontFamily: "EffaFamily",
-		// fontSize: 18,
-		marginLeft: 10,
+		fontSize: 16,
+		fontWeight: "600",
+		color: "#111827",
+	},
+	recommendationDescription: {
+		fontSize: 14,
+		color: "#4B5563",
+		lineHeight: 20,
+	},
+	recommendationReason: {
+		fontSize: 14,
+		color: "#6B7280",
+		fontStyle: "italic",
+		marginTop: 4,
 	},
 	contactContainer: {
 		padding: 20,
@@ -1022,6 +1173,137 @@ const styles = StyleSheet.create({
 		// fontSize: 18,
 		fontWeight: "bold",
 		marginLeft: 10,
+	},
+	initialView: {
+		padding: 16,
+		gap: 24,
+	},
+	summaryCard: {
+		backgroundColor: "#FFFFFF",
+		borderRadius: 16,
+		padding: 16,
+		shadowColor: "#000",
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.1,
+		shadowRadius: 4,
+		elevation: 2,
+	},
+	summaryTitle: {
+		fontSize: 18,
+		fontWeight: "600",
+		color: "#111827",
+		marginBottom: 16,
+	},
+	summaryContent: {
+		gap: 16,
+	},
+	summaryItem: {
+		flexDirection: "row",
+		alignItems: "center",
+		gap: 12,
+	},
+	summaryLabel: {
+		fontSize: 14,
+		color: "#6B7280",
+	},
+	summaryValue: {
+		fontSize: 16,
+		fontWeight: "500",
+		color: "#111827",
+	},
+	recommendationButton: {
+		borderRadius: 12,
+		overflow: "hidden",
+	},
+	gradient: {
+		flexDirection: "row",
+		alignItems: "center",
+		justifyContent: "center",
+		padding: 16,
+		gap: 8,
+	},
+	buttonText: {
+		color: "#FFFFFF",
+		fontSize: 16,
+		fontWeight: "600",
+	},
+	recommendationsContainer: {
+		padding: 16,
+		gap: 16,
+	},
+	recommendationsHeader: {
+		fontSize: 24,
+		fontWeight: "700",
+		color: "#111827",
+		marginBottom: 8,
+	},
+	recommendationCard: {
+		backgroundColor: "#FFFFFF",
+		borderRadius: 16,
+		padding: 16,
+		marginBottom: 16,
+		shadowColor: "#000",
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.1,
+		shadowRadius: 4,
+		elevation: 2,
+	},
+	recommendationHeader: {
+		flexDirection: "row",
+		justifyContent: "space-between",
+		alignItems: "center",
+		marginBottom: 12,
+	},
+	iconContainer: {
+		backgroundColor: "#EEF2FF",
+		padding: 8,
+		borderRadius: 8,
+	},
+	priorityBadge: {
+		paddingHorizontal: 8,
+		paddingVertical: 4,
+		borderRadius: 12,
+	},
+	priorityText: {
+		color: "#FFFFFF",
+		fontSize: 12,
+		fontWeight: "600",
+	},
+	recommendationTitle: {
+		fontSize: 18,
+		fontWeight: "600",
+		color: "#111827",
+		marginBottom: 8,
+	},
+	recommendationDescription: {
+		fontSize: 16,
+		color: "#4B5563",
+		lineHeight: 24,
+		marginBottom: 16,
+	},
+	recommendationDetails: {
+		flexDirection: "row",
+		gap: 16,
+		marginBottom: 16,
+	},
+	detailItem: {
+		flexDirection: "row",
+		alignItems: "center",
+		gap: 4,
+	},
+	detailText: {
+		fontSize: 14,
+		color: "#6B7280",
+	},
+	reasonContainer: {
+		backgroundColor: "#F3F4F6",
+		borderRadius: 8,
+		padding: 12,
+	},
+	reasonText: {
+		fontSize: 14,
+		color: "#4B5563",
+		fontStyle: "italic",
 	},
 });
 

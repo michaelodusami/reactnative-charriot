@@ -23,7 +23,7 @@ const ConfigurationSection = () => {
 	const [quietRoom, setQuietRoom] = useState(false);
 	const [economicRating, setEconomicRating] = useState(0); // Updated to match key "econ_rating"
 	const [extraBedding, setExtraBedding] = useState("");
-	const [selectedDietaryRestriction, setSelectedDietaryRestriction] = useState("other");
+	const [selectedDietaryRestriction, setSelectedDietaryRestriction] = useState("none");
 	const [otherDietary, setOtherDietary] = useState("");
 	const [beddingPillows, setBeddingPillows] = useState(2);
 	const [beddingMattressType, setBeddingMattressType] = useState("any");
@@ -38,13 +38,13 @@ const ConfigurationSection = () => {
 		setRoomView(preferences.room_view || "any"); // done
 		setQuietRoom(preferences.quiet_room || false);
 		setEconomicRating(preferences.econ_rating || 0);
-		setSelectedDietaryRestriction(preferences.dietary_restrictions || "other"); // done
+		setSelectedDietaryRestriction(preferences.dietary_restrictions || "none"); // done
 		setOtherDietary(preferences.dietary_restrictions_other || "");
 		setBeddingPillows(preferences.bedding_pillows || 2); // num pillows, done
 		setBeddingMattressType(preferences.bedding_mattress_type || "any"); // any
 		setBeddingPillowType(preferences.bedding_pillow_type || "any"); // any
-		setExtraBedding(preferences.bedding_other || ""); // done
-		setMiscellaneousInput(preferences.misc || ""); // done
+		setExtraBedding(preferences.bedding_other === "string" ? "" : preferences.bedding_other); // done
+		setMiscellaneousInput(preferences.misc === "string" ? "" : preferences.misc); // done
 	};
 
 	useEffect(() => {
@@ -54,7 +54,6 @@ const ConfigurationSection = () => {
 	}, [user.userId]);
 
 	const handleSave = async () => {
-		console.log(selectedDietaryRestriction, otherDietary);
 		// Create the preferences object using state values
 		const preferences = {
 			dietary_restrictions: selectedDietaryRestriction,
@@ -70,12 +69,12 @@ const ConfigurationSection = () => {
 			econ_rating: economicRating,
 		};
 
-		if (selectedDietaryRestriction === "other") {
-			preferences.dietary_restrictions = "other";
-			preferences.dietary_restrictions_other = otherDietary;
-		} else {
-			preferences.dietary_restrictions = selectedDietaryRestriction;
-		}
+		// if (selectedDietaryRestriction === "other") {
+		// 	preferences.dietary_restrictions = "other";
+		// 	preferences.dietary_restrictions_other = otherDietary;
+		// } else {
+		// 	preferences.dietary_restrictions = selectedDietaryRestriction;
+		// }
 
 		try {
 			// Call the function to update preferences in the backend
@@ -212,39 +211,41 @@ const ConfigurationSection = () => {
 				description="Let us know about any dietary restrictions"
 			>
 				<View style={configStyles.optionRow}>
-					{["none", "vegetarian", "vegan", "gluten-free", "halal", "kosher", "other"].map(
-						(diet) => (
-							<TouchableOpacity
-								key={diet}
+					{["other", "vegetarian", "vegan"].map((diet) => (
+						<TouchableOpacity
+							key={diet}
+							style={[
+								configStyles.choiceButton,
+								selectedDietaryRestriction === diet && configStyles.selectedOption,
+							]}
+							onPress={() => setSelectedDietaryRestriction(String(diet))}
+						>
+							<Text
 								style={[
-									configStyles.choiceButton,
+									configStyles.choiceText,
 									selectedDietaryRestriction === diet &&
-										configStyles.selectedOption,
+										configStyles.selectedText,
 								]}
-								onPress={() => setSelectedDietaryRestriction(diet)}
 							>
-								<Text
-									style={[
-										configStyles.choiceText,
-										selectedDietaryRestriction === diet &&
-											configStyles.selectedText,
-									]}
-								>
-									{diet}
-								</Text>
-							</TouchableOpacity>
-						)
-					)}
+								{diet}
+							</Text>
+						</TouchableOpacity>
+					))}
 				</View>
-				{selectedDietaryRestriction === "other" && (
-					<TextInput
-						style={configStyles.textInput}
-						value={otherDietary}
-						onChangeText={setOtherDietary}
-						placeholder="Enter other dietary restriction"
-						placeholderTextColor="#999"
-					/>
-				)}
+			</ConfigItem>
+			<ConfigItem
+				icon="food-apple"
+				title="Additional Dietary Restrictions"
+				description="Enter any additional dietary restrictions you may have"
+			>
+				<TextInput
+					style={configStyles.textInput}
+					value={otherDietary}
+					onChangeText={(text) => setOtherDietary(text)}
+					placeholder="Enter dietary restrictions"
+					placeholderTextColor="#999"
+					keyboardType="default"
+				/>
 			</ConfigItem>
 			{/* Climate Control */}
 			<ConfigItem

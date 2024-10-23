@@ -103,7 +103,7 @@ const SettingsSection = () => {
 				/>
 			</SettingItem>
 
-			<SettingItem
+			{/* <SettingItem
 				icon="contrast-box"
 				title="High Contrast Mode"
 				description="Enhance visibility for users with visual impairments"
@@ -114,7 +114,7 @@ const SettingsSection = () => {
 					trackColor={{ false: "#767577", true: "#FA5A5A" }}
 					thumbColor={highContrastMode ? "#f4f3f4" : "#f4f3f4"}
 				/>
-			</SettingItem>
+			</SettingItem> */}
 			{/* 
 			<SettingItem
 				icon="volume-high"
@@ -153,7 +153,7 @@ const SettingsSection = () => {
 						<View style={styles.settingTitleContainer}>
 							<ThemedText style={styles.settingTitle}>{"Delete Account"}</ThemedText>
 							<ThemedText style={styles.settingDescription}>
-								{"Permanently remove your account from the app system"}
+								{"Permanently remove your data \n from the app system"}
 							</ThemedText>
 						</View>
 					</Pressable>
