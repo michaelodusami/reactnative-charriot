@@ -1,50 +1,51 @@
-# Welcome to your Expo app 👋
+# 🚀 Chariot - Mobile App  
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+🏆 **1st Place @ Marriott CodeFest VT**  
+📱 **Cross-Platform Hospitality Experience App**  
+🔹 **Built with:** React Native, Expo Go, FastAPI, AWS  
 
-## Get started
+---
 
-1. Install dependencies
+## 📌 Overview  
 
-   ```bash
-   npm install
-   ```
+Chariot is a **mobile-first hospitality experience platform** that enhances **guest experiences, hotel management, and personalized recommendations**. Designed as a **cross-platform solution** using **React Native & FastAPI**, the app provides a seamless and scalable way for travelers to **find hotels, book rooms, access amenities, and receive AI-powered recommendations**.  
 
-2. Start the app
+### 🌟 Key Features:
+- 🔍 **Personalized Hotel & Room Recommendations**  
+- 🛎 **In-App Concierge & Room Service Requests**  
+- 🏷 **Status on Present, Past, and Future Trips**  
+---
 
-   ```bash
-    npx expo start
-   ```
+## 🏗 Tech Stack  
 
-In the output, you'll find options to open the app in a
+### 📱 Mobile Development  
+- **React Native** – Cross-platform UI development  
+- **Expo Go** – Rapid development & testing  
+- **React Navigation** – Smooth in-app navigation    
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+### 🌍 Backend  
+- **FastAPI** – High-performance backend API  
+- **DynamoDBL** – Efficient data storage  
+- **AWS Lambda** – Scalable backend infrastructure  
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+---
 
-## Get a fresh project
+## 🔥 Core Features in Detail  
 
-When you're ready, run:
+### 🎯 **Personalized Hotel & Room Recommendations**  
+- AI-driven system suggests **hotels and room types** based on user preferences.  
+- Uses **historical booking data, location, and guest reviews** to refine recommendations.  
 
-```bash
-npm run reset-project
-```
+### 📆 **Seamless Booking & Reservation System**  
+- **Integrated booking flow** with Marriott's API for real-time availability.  
+- Secure payment processing using **Stripe API**.  
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### 🛎 **In-App Concierge & Room Service Requests**  
+- **Request services** like extra towels, housekeeping, or room upgrades directly from the app.
 
-## Learn more
+---
 
-To learn more about developing your project with Expo, look at the following resources:
+## 👨‍💻 Contributors  
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- **Michael-Andre Odusami** – Mobile Developer
+- **Arnav Jagtap** – Mobile Developer
