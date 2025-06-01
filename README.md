@@ -38,10 +38,6 @@ Chariot is a **mobile-first hospitality experience platform** that enhances **gu
 - AI-driven system suggests **hotels and room types** based on user preferences.  
 - Uses **historical booking data, location, and guest reviews** to refine recommendations.  
 
-### 📆 **Seamless Booking & Reservation System**  
-- **Integrated booking flow** with Marriott's API for real-time availability.  
-- Secure payment processing using **Stripe API**.  
-
 ### 🛎 **In-App Concierge & Room Service Requests**  
 - **Request services** like extra towels, housekeeping, or room upgrades directly from the app.
 
